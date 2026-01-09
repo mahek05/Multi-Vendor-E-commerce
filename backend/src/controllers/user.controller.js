@@ -1,349 +1,205 @@
 const User = require("../models/user.model");
+const AuthToken = require("../models/auth_token.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
 
 /**
- * SignUp User
+ * User Signup
  */
 exports.signup = async (req, res) => {
     try {
         const { name, email, password, address, phone_number } = req.body;
 
-        if (!email || !password || !name) {
-            return res.status(400).json({ message: "All fields required" });
+        if (!name || !email || !password) {
+            return response.error(res, 9000, 400);
         }
 
-        const checkEmail = await User.findOne({ email });
+        const existingUser = await User.findOne({ where: { email } });
 
-        // Check if user is deleted
-        if (checkEmail && checkEmail.is_deleted) {
-            return response.error(res, 1018, 409);
-        };
+        if (existingUser && existingUser.is_deleted) {
+            return response.error(res, 1009, 403);
+        }
 
-        // Check if email already exists
-        if (checkEmail) {
-            return response.error(res, 1004, 409);
-        };
+        if (existingUser) {
+            return response.error(res, 1003, 409);
+        }
 
-        // Create new user
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         await User.create({
             name,
             email,
-            password,
+            password: hashedPassword,
             address,
-            phone_number
+            phone_number,
         });
-
 
         return response.success(res, 1001, null, 201);
     } catch (error) {
-        console.log('error', error);
+        console.error(error);
         return response.error(res, 9999);
     }
 };
 
 /**
- * Login
+ * User Login
  */
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Check user exists
-        const user = await User.findOne({ email });
+        if (!email || !password) {
+            return response.error(res, 1004, 400);
+        }
+
+        const user = await User.findOne({ where: { email } });
+
         if (!user) {
-            return response.error(res, 1005);
-        };
+            return response.error(res, 1006, 404);
+        }
 
-        // Check if user is deleted
         if (user.is_deleted) {
-            return response.error(res, 1018, 409);
-        };
+            return response.error(res, 1009, 403);
+        }
 
-        // Check password
-        if (!await User.validatePassword(password, user.password)) {
-            return response.error(res, 1005);
-        };
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return response.error(res, 1007, 401);
+        }
 
-        // Create session
-        const token = await UserSession.createSessionToken(user._id);
-
-        const responseData = {
-            _id: user._id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            token
-        };
-        return response.success(res, 1002, responseData);
-    } catch (error) {
-        console.log('error', error);
-        return response.error(res, 9999);
-    }
-};
-
-/**
- * Get profile  
- */
-const getProfile = async (req, res) => {
-    try {
-        const { _id } = req.user;
-        const user = await User.findOne({ _id }, '_id first_name last_name email profile_image role');
-        return response.success(res, 1003, user);
-    } catch (error) {
-        console.log('error', error);
-        return response.error(res, 9999);
-    }
-};
-
-/**
- * Logout
- */
-const logout = async (req, res) => {
-    try {
-        const headerToken = req.headers.authorization;
-        await UserSession.deleteOne({ token: headerToken });
-        return response.success(res, 1006);
-    } catch (error) {
-        console.log('error', error);
-        return response.error(res, 9999);
-    }
-};
-
-/**
- * Send forgot password email
- */
-const sendForgotPasswordEmail = async (req, res) => {
-    try {
-        const validation = new validator(req.body, {
-            email: 'required|email|string',
-        });
-        if (validation.fails()) {
-            const firstMessage = Object.keys(validation.errors.all())[0];
-            return response.error(res, validation.errors.first(firstMessage), 400);
-        };
-        const { email } = req.body;
-
-        // Check user exists
-        const user = await User.findOne({ email }, '_id first_name last_name email is_deleted');
-        if (!user) {
-            return response.error(res, 1007);
-        };
-
-        // Check if user is deleted
-        if (user.is_deleted) {
-            return response.error(res, 1018, 409);
-        };
-
-        // Create forgot password link
-        const tokenRes = await createJWT({ data: { user_id: user._id }, expiry_time: forgot_link_expiry_time });
-        if (!tokenRes.success) {
-            return response.error(res, 1020);
-        };
-
-        // Save forgot password link
-        await User.updateOne(
-            { _id: user._id },
-            {
-                $set: {
-                    forgot_password_token: tokenRes.token
-                }
-            });
-
-        // Read email template
-        let template = fs.readFileSync(
-            './src/helpers/email_service/email_formats/forgot_password.html',
-            'utf-8'
-        );
-        // Replace placeholders with dynamic values
-        template = template.replace('${name}', `${user.first_name} ${user.last_name}`);
-        template = template.replace('${link}', `${frontend_base_url}/forgot-password?token=${tokenRes.token}`);
-        template = template.replace('${support_center_email}', support_center_email);
-
-
-        // Send OTP
-        const mailResponse = await mailService(
-            email,
-            'Forgot Password OTP',
-            template
-        );
-        if (!mailResponse.success) {
-            return response.error(res, 1011);
-        };
-
-        return response.success(res, 1012);
-    } catch (error) {
-        console.log('error', error);
-        return response.error(res, 9999);
-    }
-};
-
-/**
- * Verify forgot password OTP
- */
-const verifyForgotPasswordLink = async (req, res) => {
-    try {
-        const validation = new validator(req.body, {
-            token: 'required|string',
-        });
-        if (validation.fails()) {
-            const firstMessage = Object.keys(validation.errors.all())[0];
-            return response.error(res, validation.errors.first(firstMessage), 400);
-        };
-        const { token } = req.body;
-
-        // Verify forgot password token
-        const verifyResponse = await verifyJWT(token);
-        if (!verifyResponse.success) {
-            return response.error(res, 1014);
-        };
-
-        // Check user exists
-        const user = await User.findOne({ _id: verifyResponse.data.user_id }, '_id email is_deleted forgot_password_token');
-        if (!user) {
-            return response.error(res, 1014);
-        };
-
-        // Check if user is deleted
-        if (user.is_deleted) {
-            return response.error(res, 1018, 409);
-        };
-
-        // Check if forgot password token is expired
-        if (user.forgot_password_token !== token) {
-            return response.error(res, 1014);
-        };
-
-
-        return response.success(res, 1015);
-    } catch (error) {
-        console.log('error', error);
-        return response.error(res, 9999);
-    }
-};
-
-/**
- * Forgot password
- */
-const forgotPassword = async (req, res) => {
-    try {
-        const validation = new validator(req.body, {
-            token: 'required|string',
-            password: 'required|string|min:8|max:30',
-        });
-        if (validation.fails()) {
-            const firstMessage = Object.keys(validation.errors.all())[0];
-            return response.error(res, validation.errors.first(firstMessage), 400);
-        };
-        const { token, password } = req.body;
-
-        // Verify forgot password token
-        const verifyResponse = await verifyJWT(token);
-        if (!verifyResponse.success) {
-            return response.error(res, 1014);
-        };
-
-        // Check user exists
-        const user = await User.findOne({ _id: verifyResponse.data.user_id }, '_id email is_deleted forgot_password_token');
-        if (!user) {
-            return response.error(res, 1014);
-        };
-
-        // Check if user is deleted
-        if (user.is_deleted) {
-            return response.error(res, 1018, 409);
-        };
-
-        // Check if forgot password token is expired
-        if (user.forgot_password_token !== token) {
-            return response.error(res, 1014);
-        };
-
-        // Update password
-        await User.updateOne(
-            { _id: user._id },
-            {
-                $set: {
-                    password,
-                    forgot_password_token: null,
-                }
-            }
+        await AuthToken.update(
+            { is_active: false },
+            { where: { entity_id: user.id, entity_type: "USER" } }
         );
 
-        // Delete all sessions
-        await UserSession.deleteMany({ user_id: user._id });
+        const accessToken = jwt.sign(
+            { entity_id: user.id, role: "USER" },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
 
-        return response.success(res, 1016);
+        const refreshToken = jwt.sign(
+            { entity_id: user.id, role: "USER" },
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        const refreshExpiry = new Date();
+        refreshExpiry.setDate(refreshExpiry.getDate() + 7);
+
+        await AuthToken.create({
+            entity_id: user.id,
+            entity_type: "USER",
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            expires_at: refreshExpiry,
+            is_active: true,
+        });
+
+        return response.success(
+            res,
+            1002,
+            { access_token: accessToken, refresh_token: refreshToken },
+            200
+        );
     } catch (error) {
-        console.log('error', error);
+        console.error(error);
         return response.error(res, 9999);
     }
 };
+
+/**
+ * User Logout
+ */
+exports.logout = async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return response.error(res, 1008, 401);
+        }
+
+        await AuthToken.update(
+            { is_active: false },
+            { where: { access_token: token } }
+        );
+
+        return response.success(res, 1005, null, 200);
+    } catch (error) {
+        console.error(error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getProfile = async (req, res) => {
+    try {
+        const { user_id } = req.user;
+
+        const user = await User.findOne({
+            where: { id: user_id },
+            attributes: ["name", "email", "address", "phone_number"],
+        });
+
+        if (!user) {
+            return response.error(res, 1006, 404);
+        }
+
+        return response.success(res, 1010, user, 200);
+    } catch (error) {
+        console.error("Admin profile error:", error);
+        return response.error(res, 9999);
+    }
+};
+
 
 /**
  * Update profile
  */
-const updateProfile = async (req, res) => {
+exports.updateProfile = async (req, res) => {
     try {
-        const validation = new validator(req.body, {
-            first_name: 'string|min:3|max:50',
-            last_name: 'string|min:3|max:50',
-        });
-        if (validation.fails()) {
-            const firstMessage = Object.keys(validation.errors.all())[0];
-            return response.error(res, validation.errors.first(firstMessage), 400);
-        };
-        const {
-            user: { _id },
-            body: { first_name, last_name },
-            files: file
-        } = req;
+        const { user_id } = req.user;
+        const { name, address, phone_number } = req.body;
 
-        // Find user
-        const user = await User.findOne({ _id }, '_id first_name last_name profile_image');
+        const user = await User.findOne({ where: { id: user_id } });
+
         if (!user) {
-            return response.error(res, 1007, 404);
-        };
+            return response.error(res, 1006, 404); // User not found
+        }
 
-        let updateObj = {
-            first_name,
-            last_name,
-        };
+        await user.update({
+            name: name ?? user.name,
+            address: address ?? user.address,
+            phone_number: phone_number ?? user.phone_number,
+        });
 
-        if (file.length > 0) {
-            // Validate file
-            const validateRes = await profileImageValidation(file);
-            if (!validateRes.success) {
-                return response.error(res, validateRes.message, 400);
-            };
-
-            // Upload file
-            const uploadRes = await uploadFile(file[0], "profileImages");
-            if (!uploadRes.success) {
-                return response.error(res, 1021, 400);
-            };
-
-            updateObj.profile_image = uploadRes.fileName;
-        };
-
-
-        // Update user
-        await User.updateOne(
-            { _id },
-            {
-                $set: updateObj
-            },
-        );
-
-        // Delete Old Profile Image
-        if (user.profile_image) {
-            await deleteFile(path.basename(user.profile_image), "profileImages");
-        };
-
-        return response.success(res, 1019);
+        return response.success(res, 1011, user, 200);
     } catch (error) {
-        console.log('error', error);
+        console.error("Update user profile error:", error);
         return response.error(res, 9999);
     }
+};
+
+exports.deactivateProfile = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+
+    const user = await User.findOne({ where: { id: user_id } });
+
+    if (!user) {
+      return response.error(res, 1006, 404);
+    }
+
+    await user.update({ is_deleted: true });
+
+    // deactivate all tokens
+    await AuthToken.update(
+      { is_active: false },
+      { where: { entity_id: user_id, entity_type: "USER" } }
+    );
+
+    return response.success(res, 1012, null, 200);
+  } catch (error) {
+    console.error("Deactivate user error:", error);
+    return response.error(res, 9999);
+  }
 };

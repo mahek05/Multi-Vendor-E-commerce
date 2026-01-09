@@ -28,6 +28,7 @@ const Seller = sequelize.define(
 
         address: {
             type: DataTypes.TEXT,
+            allowNull: false
         },
 
         phone_number: {

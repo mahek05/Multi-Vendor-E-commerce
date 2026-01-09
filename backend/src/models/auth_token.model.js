@@ -10,14 +10,14 @@ const AuthToken = sequelize.define(
             primaryKey: true,
         },
 
-        user_id: {
+        entity_id: {
             type: DataTypes.UUID,
             allowNull: false,
-            references: {
-                model: "users",
-                key: "id",
-            },
-            onDelete: "CASCADE",
+        },
+
+        entity_type: {
+            type: DataTypes.ENUM("USER", "ADMIN", "SELLER"),
+            allowNull: false,
         },
 
         access_token: {
@@ -28,6 +28,11 @@ const AuthToken = sequelize.define(
         refresh_token: {
             type: DataTypes.TEXT,
             allowNull: false,
+        },
+
+        is_active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
         },
 
         expires_at: {

@@ -1,36 +1,38 @@
-const Admin = require("../models/admin.model");
+const Seller = require("../models/seller.model");
 const AuthToken = require("../models/auth_token.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
 
 /**
- * Admin Signup
+ * Seller Signup
  */
 exports.signup = async (req, res) => {
     try {
-        const { email, password, name } = req.body;
+        const { name, email, password, address, phone_number } = req.body;
 
-        if (!email || !password || !name) {
+        if (!name || !email || !password) {
             return response.error(res, 9000, 400);
         }
 
-        const existingAdmin = await Admin.findOne({ where: { email } });
+        const existingSeller = await Seller.findOne({ where: { email } });
 
-        if (existingAdmin && existingAdmin.is_deleted) {
-            return response.error(res, 1009, 403); // deactivated
+        if (existingSeller && existingSeller.is_deleted) {
+            return response.error(res, 1009, 403);
         }
 
-        if (existingAdmin) {
-            return response.error(res, 1003, 409); // already registered
+        if (existingSeller) {
+            return response.error(res, 1003, 409);
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await Admin.create({
+        await Seller.create({
+            name,
             email,
             password: hashedPassword,
-            name,
+            address,
+            phone_number,
         });
 
         return response.success(res, 1001, null, 201);
@@ -41,7 +43,7 @@ exports.signup = async (req, res) => {
 };
 
 /**
- * Admin Login
+ * Seller Login
  */
 exports.login = async (req, res) => {
     try {
@@ -51,34 +53,34 @@ exports.login = async (req, res) => {
             return response.error(res, 1004, 400);
         }
 
-        const admin = await Admin.findOne({ where: { email } });
+        const seller = await Seller.findOne({ where: { email } });
 
-        if (!admin) {
+        if (!seller) {
             return response.error(res, 1006, 404);
         }
 
-        if (admin.is_deleted) {
+        if (seller.is_deleted) {
             return response.error(res, 1009, 403);
         }
 
-        const isMatch = await bcrypt.compare(password, admin.password);
+        const isMatch = await bcrypt.compare(password, seller.password);
         if (!isMatch) {
             return response.error(res, 1007, 401);
         }
 
         await AuthToken.update(
             { is_active: false },
-            { where: { entity_id: admin.id, entity_type: "ADMIN" } }
+            { where: { entity_id: seller.id, entity_type: "SELLER" } }
         );
 
         const accessToken = jwt.sign(
-            { entity_id: admin.id, role: "ADMIN" },
+            { entity_id: seller.id, role: "SELLER" },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
 
         const refreshToken = jwt.sign(
-            { entity_id: admin.id, role: "ADMIN" },
+            { entity_id: seller.id, role: "SELLER" },
             process.env.JWT_REFRESH_SECRET,
             { expiresIn: "7d" }
         );
@@ -87,8 +89,8 @@ exports.login = async (req, res) => {
         refreshExpiry.setDate(refreshExpiry.getDate() + 7);
 
         await AuthToken.create({
-            entity_id: admin.id,
-            entity_type: "ADMIN",
+            entity_id: seller.id,
+            entity_type: "SELLER",
             access_token: accessToken,
             refresh_token: refreshToken,
             expires_at: refreshExpiry,
@@ -108,7 +110,7 @@ exports.login = async (req, res) => {
 };
 
 /**
- * Admin Logout
+ * Seller Logout
  */
 exports.logout = async (req, res) => {
     try {
@@ -129,72 +131,75 @@ exports.logout = async (req, res) => {
     }
 };
 
-/**
- * Admin Profile
- */
 exports.getProfile = async (req, res) => {
     try {
-        const { admin_id } = req.admin;
+        const { seller_id } = req.seller;
 
-        const admin = await Admin.findOne({
-            where: { id: admin_id },
-            attributes: ["name", "email"],
+        const seller = await Seller.findOne({
+            where: { id: seller_id },
+            attributes: ["name", "email", "address", "phone_number"],
         });
 
-        if (!admin) {
+        if (!seller) {
             return response.error(res, 1006, 404);
         }
 
-        return response.success(res, 1010, admin, 200);
+        return response.success(res, 1010, seller, 200);
     } catch (error) {
-        console.error("Admin profile error:", error);
+        console.error("Seller profile error:", error);
         return response.error(res, 9999);
     }
 };
 
+
+/**
+ * Update profile
+ */
 exports.updateProfile = async (req, res) => {
     try {
-        const { admin_id } = req.admin;
-        const { name } = req.body;
+        const { seller_id } = req.seller;
+        const { name, address, phone_number } = req.body;
 
-        const admin = await Admin.findOne({ where: { id: admin_id } });
+        const seller = await Seller.findOne({ where: { id: seller_id } });
 
-        if (!admin) {
-            return response.error(res, 1006, 404);
+        if (!seller) {
+            return response.error(res, 1006, 404); // Seller not found
         }
 
-        await admin.update({
-            name: name ?? admin.name,
+        await seller.update({
+            name: name ?? seller.name,
+            address: address ?? seller.address,
+            phone_number: phone_number ?? seller.phone_number,
         });
 
-        return response.success(res, 1011, admin, 200);
+        return response.success(res, 1011, seller, 200);
     } catch (error) {
-        console.error("Update admin profile error:", error);
+        console.error("Update seller profile error:", error);
         return response.error(res, 9999);
     }
 };
 
 exports.deactivateProfile = async (req, res) => {
-    try {
-        const { admin_id } = req.admin;
+  try {
+    const { seller_id } = req.seller;
 
-        const admin = await Admin.findOne({ where: { id: admin_id } });
+    const seller = await Seller.findOne({ where: { id: seller_id } });
 
-        if (!admin) {
-            return response.error(res, 1006, 404);
-        }
-
-        await admin.update({ is_deleted: true });
-
-        // deactivate all tokens
-        await AuthToken.update(
-            { is_active: false },
-            { where: { entity_id: admin_id, entity_type: "ADMIN" } }
-        );
-
-        return response.success(res, 1012, null, 200);
-    } catch (error) {
-        console.error("Deactivate admin error:", error);
-        return response.error(res, 9999);
+    if (!seller) {
+      return response.error(res, 1006, 404);
     }
+
+    await seller.update({ is_deleted: true });
+
+    // deactivate all tokens
+    await AuthToken.update(
+      { is_active: false },
+      { where: { entity_id: seller_id, entity_type: "SELLER" } }
+    );
+
+    return response.success(res, 1012, null, 200);
+  } catch (error) {
+    console.error("Deactivate seller error:", error);
+    return response.error(res, 9999);
+  }
 };
