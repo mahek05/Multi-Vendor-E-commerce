@@ -1,0 +1,13 @@
+require("./admin.model");
+require("./auth_token.model")
+require("./cart.model");
+require("./cart_item.model");
+require("./category.model");
+require("./email_otp.model")
+require("./order.model");
+require("./order_item.model");
+require("./payment.model");
+require("./payout.model");
+require("./product.model");
+require("./seller.model");
+require("./user.model");
