@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Email Verification</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #f4f6f8;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            .container {
+                max-width: 520px;
+                margin: 40px auto;
+                background: #ffffff;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            }
+            .header {
+                background-color: #1e88e5;
+                padding: 20px;
+                text-align: center;
+                color: #ffffff;
+                font-size: 20px;
+                font-weight: bold;
+            }
+            .content {
+                padding: 30px;
+                color: #333333;
+                font-size: 14px;    
+                line-height: 1.6;
+            }
+            .otp {
+                margin: 20px auto;
+                text-align: center;
+                font-size: 26px;
+                font-weight: bold;
+                background: #f1f5f9;
+            }
+            footer{
+                text-align: right;
+                font-size: 12px;
+                font-style: italic; 
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                Email Verification
+            </div>
+
+            <div class="content">
+                <p>Hello,</p>
+
+                <p>
+                    Thank you for signing up. Please use the verification code
+                    below to
+                    verify your email address.
+                </p>
+
+                <div class="otp">{{OTP}}</div>
+
+                <p>
+                    This OTP is valid for <strong>10 minutes</strong>.
+                    Please do not share this code with anyone.
+                </p>
+            </div>
+        </div>
+        <footer>
+            Mahek Tolat Project
+        </footer>
+    </body>
+</html>

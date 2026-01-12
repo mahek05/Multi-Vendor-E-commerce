@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
 const EmailOtp = sequelize.define(
-    "email_otps",
+    "EmailOtp",
     {
         id: {
             type: DataTypes.UUID,
@@ -10,13 +10,9 @@ const EmailOtp = sequelize.define(
             primaryKey: true,
         },
 
-        user_id: {
-            type: DataTypes.UUID,
-            references: {
-                model: "users",
-                key: "id",
-            },
-            onDelete: "CASCADE",
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
 
         otp: {
@@ -36,8 +32,8 @@ const EmailOtp = sequelize.define(
     },
     {
         tableName: "email_otps",
-        timestamps: true,
         underscored: true,
+        timestamps: true,
     }
 );
 

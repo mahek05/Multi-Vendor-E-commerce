@@ -1,5 +1,6 @@
 const Admin = require("../models/admin.model");
 const AuthToken = require("../models/auth_token.model");
+const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
@@ -13,6 +14,18 @@ exports.signup = async (req, res) => {
 
         if (!email || !password || !name) {
             return response.error(res, 9000, 400);
+        }
+
+        const otpRecord = await EmailOtp.findOne({
+            where: {
+                email,
+                is_used: true,
+            },
+            order: [["updated_at", "DESC"]],
+        });
+
+        if (!otpRecord) {
+            return response.error(res, 1017, 403); // email not verified
         }
 
         const existingAdmin = await Admin.findOne({ where: { email } });

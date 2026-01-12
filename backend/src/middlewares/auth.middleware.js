@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const AuthToken = require("../models/auth_token.model");
+const Seller = require("../models/seller.model")
 const response = require("../helpers");
 
 exports.verifyAdmin = async (req, res, next) => {
@@ -101,5 +102,28 @@ exports.verifySeller = async (req, res, next) => {
     } catch (error) {
         console.error("verifySeller error:", error);
         return response.error(res, 1008, 401);
+    }
+};
+
+exports.verifySellerApproved = async (req, res, next) => {
+    try {
+        const { seller_id } = req.seller;
+
+        const seller = await Seller.findOne({
+            where: {
+                id: seller_id,
+                status: "Approved",
+                is_deleted: false,
+            },
+        });
+
+        if (!seller) {
+            return response.error(res, 1020, 403);
+        }
+
+        next();
+    } catch (error) {
+        console.error("verifySellerApproved error:", error);
+        return response.error(res, 9999);
     }
 };

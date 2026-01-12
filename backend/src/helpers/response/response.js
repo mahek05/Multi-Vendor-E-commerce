@@ -3,7 +3,7 @@ const messages = require('./messages');
 /***
  * Success Response 
  */
-module.exports.success = function (res, messageCode = null, data = null, statusCode = 200) {
+exports.success = function (res, messageCode = null, data = null, statusCode = 200) {
     let response = {};
     response.success = true;
     response.message = messages.getMessage(messageCode);
@@ -16,7 +16,7 @@ module.exports.success = function (res, messageCode = null, data = null, statusC
 /***
  * Error Response
  */
-module.exports.error = function (res, messageCode, statusCode = 422) {
+exports.error = function (res, messageCode, statusCode = 422) {
     let response = {};
     response.success = false;
     response.message = messages.getMessage(messageCode);

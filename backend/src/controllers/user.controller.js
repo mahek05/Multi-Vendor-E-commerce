@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const AuthToken = require("../models/auth_token.model");
+const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
@@ -15,6 +16,18 @@ exports.signup = async (req, res) => {
             return response.error(res, 9000, 400);
         }
 
+        const otpRecord = await EmailOtp.findOne({
+            where: {
+                email,
+                is_used: true,
+            },
+            order: [["updated_at", "DESC"]],
+        });
+
+        if (!otpRecord) {
+            return response.error(res, 1017, 403); // email not verified
+        }
+
         const existingUser = await User.findOne({ where: { email } });
 
         if (existingUser && existingUser.is_deleted) {
@@ -24,6 +37,7 @@ exports.signup = async (req, res) => {
         if (existingUser) {
             return response.error(res, 1003, 409);
         }
+
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -180,26 +194,26 @@ exports.updateProfile = async (req, res) => {
 };
 
 exports.deactivateProfile = async (req, res) => {
-  try {
-    const { user_id } = req.user;
+    try {
+        const { user_id } = req.user;
 
-    const user = await User.findOne({ where: { id: user_id } });
+        const user = await User.findOne({ where: { id: user_id } });
 
-    if (!user) {
-      return response.error(res, 1006, 404);
+        if (!user) {
+            return response.error(res, 1006, 404);
+        }
+
+        await user.update({ is_deleted: true });
+
+        // deactivate all tokens
+        await AuthToken.update(
+            { is_active: false },
+            { where: { entity_id: user_id, entity_type: "USER" } }
+        );
+
+        return response.success(res, 1012, null, 200);
+    } catch (error) {
+        console.error("Deactivate user error:", error);
+        return response.error(res, 9999);
     }
-
-    await user.update({ is_deleted: true });
-
-    // deactivate all tokens
-    await AuthToken.update(
-      { is_active: false },
-      { where: { entity_id: user_id, entity_type: "USER" } }
-    );
-
-    return response.success(res, 1012, null, 200);
-  } catch (error) {
-    console.error("Deactivate user error:", error);
-    return response.error(res, 9999);
-  }
 };

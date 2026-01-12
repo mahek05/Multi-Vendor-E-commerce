@@ -1,5 +1,6 @@
 const Seller = require("../models/seller.model");
 const AuthToken = require("../models/auth_token.model");
+const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
@@ -13,6 +14,18 @@ exports.signup = async (req, res) => {
 
         if (!name || !email || !password) {
             return response.error(res, 9000, 400);
+        }
+
+        const otpRecord = await EmailOtp.findOne({
+            where: {
+                email,
+                is_used: true,
+            },
+            order: [["updated_at", "DESC"]],
+        });
+
+        if (!otpRecord) {
+            return response.error(res, 1017, 403); // email not verified
         }
 
         const existingSeller = await Seller.findOne({ where: { email } });
@@ -180,26 +193,26 @@ exports.updateProfile = async (req, res) => {
 };
 
 exports.deactivateProfile = async (req, res) => {
-  try {
-    const { seller_id } = req.seller;
+    try {
+        const { seller_id } = req.seller;
 
-    const seller = await Seller.findOne({ where: { id: seller_id } });
+        const seller = await Seller.findOne({ where: { id: seller_id } });
 
-    if (!seller) {
-      return response.error(res, 1006, 404);
+        if (!seller) {
+            return response.error(res, 1006, 404);
+        }
+
+        await seller.update({ is_deleted: true });
+
+        // deactivate all tokens
+        await AuthToken.update(
+            { is_active: false },
+            { where: { entity_id: seller_id, entity_type: "SELLER" } }
+        );
+
+        return response.success(res, 1012, null, 200);
+    } catch (error) {
+        console.error("Deactivate seller error:", error);
+        return response.error(res, 9999);
     }
-
-    await seller.update({ is_deleted: true });
-
-    // deactivate all tokens
-    await AuthToken.update(
-      { is_active: false },
-      { where: { entity_id: seller_id, entity_type: "SELLER" } }
-    );
-
-    return response.success(res, 1012, null, 200);
-  } catch (error) {
-    console.error("Deactivate seller error:", error);
-    return response.error(res, 9999);
-  }
 };
