@@ -35,6 +35,12 @@ const Admin = sequelize.define(
         tableName: "admins",
         timestamps: true,
         underscored: true,
+
+        defaultScope: {
+            attributes: {
+                exclude: ["password"],
+            },
+        },
     }
 );
 

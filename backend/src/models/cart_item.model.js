@@ -16,10 +16,10 @@ const CartItem = sequelize.define(
             allowNull: false,
         },
 
-        cart_id: {
+        user_id: {
             type: DataTypes.UUID,
             references: {
-                model: "carts",
+                model: "users",
                 key: "id",
             },
             onDelete: "CASCADE",

@@ -31,10 +31,23 @@ const Payout = sequelize.define(
             },
         },
 
-        is_deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
+        seller_id: {
+            type: DataTypes.UUID,
+            references: {
+                model: "sellers",
+                key: "id",
+            },
         },
+
+        status: {
+            type: DataTypes.ENUM("Pending", "Paid", "Order Cancelled", "Order Returned"),
+            defaultValue: "Pending",
+        },
+
+        // is_deleted: {
+        //     type: DataTypes.BOOLEAN,
+        //     defaultValue: false,
+        // },
     },
     {
         tableName: "payouts",

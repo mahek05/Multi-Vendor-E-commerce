@@ -27,12 +27,13 @@ const Product = sequelize.define(
 
         stock: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            defaultValue: 0,
+            allowNull: false
         },
 
         image: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
 
         category_id: {

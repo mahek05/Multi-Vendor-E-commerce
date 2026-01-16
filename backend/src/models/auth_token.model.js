@@ -44,6 +44,12 @@ const AuthToken = sequelize.define(
         tableName: "auth_tokens",
         timestamps: true,
         underscored: true,
+
+        defaultScope: {
+            attributes: {
+                exclude: ["refresh_token"],
+            },
+        },
     }
 );
 

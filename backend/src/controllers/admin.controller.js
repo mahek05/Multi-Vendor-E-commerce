@@ -1,9 +1,14 @@
 const Admin = require("../models/admin.model");
 const AuthToken = require("../models/auth_token.model");
 const EmailOtp = require("../models/email_otp.model");
+const Seller = require("../models/seller.model")
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
+const {
+    getPaginationMetadata,
+    getPaginatedResponse
+} = require("../helpers/pagination");
 
 /**
  * Admin Signup
@@ -64,7 +69,10 @@ exports.login = async (req, res) => {
             return response.error(res, 1004, 400);
         }
 
-        const admin = await Admin.findOne({ where: { email } });
+        const admin = await Admin.findOne({
+            where: { email },
+            attributes: { include: ["password"] }
+        });
 
         if (!admin) {
             return response.error(res, 1006, 404);
@@ -208,6 +216,63 @@ exports.deactivateProfile = async (req, res) => {
         return response.success(res, 1012, null, 200);
     } catch (error) {
         console.error("Deactivate admin error:", error);
+        return response.error(res, 9999);
+    }
+};
+
+
+exports.sellerStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const { id } = req.params;
+        const { admin_id } = req.admin;
+
+        const seller = await Seller.findOne({
+            where: {
+                id: id,
+                is_deleted: false,
+            },
+        });
+
+        if (!seller) {
+            return response.error(res, 1006, 404);
+        }
+
+        await seller.update({
+            status: status,
+            approved_by: admin_id
+        });
+
+        return response.success(res, 1021, null, 201);
+    } catch (error) {
+        console.error(error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getSeller = async (req, res) => {
+    try {
+        const { page, limit, offset } = getPaginationMetadata(
+            req.query.page,
+            req.query.limit
+        );
+
+        const sellers = await Seller.findAndCountAll({
+            where: { is_deleted: false },
+            limit,
+            offset,
+            order: [["created_at", "DESC"]],
+        });
+
+        const paginatedResponse = getPaginatedResponse(
+            sellers,
+            page,
+            limit
+        );
+
+        return response.success(res, null, paginatedResponse, 200);
+    } catch (error) {
+        console.error("Error:", error);
         return response.error(res, 9999);
     }
 };

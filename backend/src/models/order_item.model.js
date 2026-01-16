@@ -21,8 +21,37 @@ const OrderItem = sequelize.define(
         },
 
         status: {
-            type: DataTypes.ENUM("Order Placed", "Shipped", "Out for Delivery", "Delivered"),
+            type: DataTypes.ENUM(
+                "Order Placed",
+                "Order Cancelled",
+                "Shipped",
+                "Out for Delivery",
+                "Delivered",
+                "Refunded",
+                "Return Requested",
+                "Return Request Approved"
+            ),
             defaultValue: "Order Placed",
+        },
+
+        return_reason: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+
+        returned_on: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
+        delivered_on: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
+        payout_eligible_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
         },
 
         order_id: {

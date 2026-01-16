@@ -1,5 +1,5 @@
 const Category = require("../models/category.model");
-const response = require("../helpers")
+const response = require("../helpers");
 const {
     getPaginationMetadata,
     getPaginatedResponse
@@ -32,7 +32,7 @@ exports.updateCategory = async (req, res) => {
         });
 
         if (!category) {
-            return response.error(res, 2002, 404); // Category not found
+            return response.error(res, 2002, 404);
         }
 
         await category.update({

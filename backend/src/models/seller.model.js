@@ -37,7 +37,7 @@ const Seller = sequelize.define(
         },
 
         status: {
-            type: DataTypes.ENUM("Pending", "Approved", "Rejected"),
+            type: DataTypes.ENUM("Pending", "Approved", "Suspended"),
             defaultValue: "Pending",
         },
 
@@ -53,11 +53,22 @@ const Seller = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: false,
         },
+
+        stripe_account_id: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
     },
     {
         tableName: "sellers",
         timestamps: true,
         underscored: true,
+
+        defaultScope: {
+            attributes: {
+                exclude: ["approved_by"],
+            },
+        },
     }
 );
 

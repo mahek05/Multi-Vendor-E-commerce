@@ -67,7 +67,10 @@ exports.login = async (req, res) => {
             return response.error(res, 1004, 400);
         }
 
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({
+            where: { email },
+            attributes: { include: ["password"] }
+        });
 
         if (!user) {
             return response.error(res, 1006, 404);

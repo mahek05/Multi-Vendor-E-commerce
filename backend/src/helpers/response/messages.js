@@ -21,18 +21,47 @@ const MESSAGES = {
     '1018': 'OTP already sent. Please wait before requesting again.',
     '1019': 'Too many login attempts. Please try again later.',
     '1020': 'Seller account is not approved by admin.',
+    '1021': "Seller status changed.",
 
     //Category
     '2001': 'Category created successfully.',
     '2002': 'Category not found!',
-    '2003': 'Category deleted',
-    '2004': 'Category updated',
+    '2003': 'Category deleted successfully.',
+    '2004': 'Category updated successfully.',
 
     //Product
-    '3001': 'Product created successfully',
+    '3001': 'Product created successfully.',
     '3002': 'Product not found!',
-    '3003': 'Product updated',
-    '3004': 'Product deleted',
+    '3003': 'Product updated successfully.',
+    '3004': 'Product deleted successfully.',
+
+    //Cart Item
+    '4001': 'Product added in Cart.',
+    '4002': 'Cart Item not found!',
+    '4003': 'Cart Item updated successfully.',
+    '4004': 'Cart Item deleted successfully.',
+
+    //Order, Order Item, Payout
+    '5001': 'Cart empty.',
+    '5002': 'Payment failed.',
+    '5003': 'Order placed.',
+    '5004': 'Order history.',
+    '5005': 'Order refunded.',
+    '5006': 'Order Item not found.',
+    '5007': 'Order Item status updated.',
+    '5008': 'Invalid input',
+    '5009': 'Not eligible for cancel order.',
+    '5010': 'Payment not found.',
+    '5011': 'Order Cancelled.',
+    '5012': 'Payout record not found.',
+    '5013': 'Seller has already been paid for this item.',
+    '5014': 'This order was refunded.',
+    '5015': 'Seller Stripe account not found or not connected.',
+    '5016': 'Seller Stripe account not found or not connected.',
+    '5017': 'Can\'t be refunded',
+    '5018': 'Product can\'t be returned.',
+    '5019': 'Can\'t return.',
+    '5020': 'Return application has been submitted.',
 
     // Common
     '9000': 'Please enter valid data!',

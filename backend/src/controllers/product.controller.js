@@ -1,35 +1,42 @@
+const fs = require("fs");
+const path = require("path");
 const Product = require("../models/product.model");
 const Category = require("../models/category.model");
-const response = require("../helpers")
+const response = require("../helpers");
 const {
     getPaginationMetadata,
     getPaginatedResponse
 } = require("../helpers/pagination");
 
+const deleteFile = (filePath) => {
+    if (!filePath) return;
+    const fullPath = path.join(__dirname, "..", "..", filePath);
+
+    fs.unlink(fullPath, (err) => {
+        if (err) {
+            console.error(`Failed to delete file: ${fullPath}`, err);
+        } else {
+            console.log(`Successfully deleted file: ${fullPath}`);
+        }
+    });
+};
+
 exports.createProduct = async (req, res) => {
-    // try {
-    //     const productData = { ...req.body };
-
-    //     if (req.file) {
-    //         productData.image = `/uploads/${req.file.filename}`;
-    //     }
-
-    //     const product = await Product.create(productData);
-
-    //     res.status(201).json(product);
-    // } catch (error) {
-    //     console.error("CREATE PRODUCT ERROR:", error);
-    //     res.status(500).json({ message: "Server error" });
-    // }
-
     try {
-        const { product_name, description, price, stock, image, category_id } = req.body;
-        const seller_id = req.sellerId;
+        const { product_name, description, price, stock, category_id } = req.body;
+        const seller_id = req.seller.seller_id;
+
+        let imagePath = null;
+
+        // FIXED: Correctly handle image variable
+        if (req.file) {
+            imagePath = `/uploads/${req.file.filename}`;
+        }
 
         await Product.create({
             product_name,
             description,
-            image,
+            image: imagePath, // Use the variable we defined
             category_id,
             price,
             stock,
@@ -43,35 +50,16 @@ exports.createProduct = async (req, res) => {
 };
 
 exports.updateProduct = async (req, res) => {
-    // try {
-    //     const updateData = { ...req.body };
-
-    //     if (req.file) {
-    //         updateData.image = `/uploads/${req.file.filename}`;
-    //     }
-
-    //     const product = await Product.findOneAndUpdate(
-    //         { _id: req.params.id, deletedAt: null },
-    //         updateData,
-    //         { new: true }
-    //     );
-
-    //     if (!product) {
-    //         return res.status(404).json({ message: "Product not found" });
-    //     }
-
-    //     res.json(product);
-    // } catch (error) {
-    //     console.error("UPDATE PRODUCT ERROR:", error);
-    //     res.status(500).json({ message: "Server error" });
-    // }
-
     try {
-        const { product_name, description, price, stock, image, category_id } = req.body;
-
+        const { product_name, description, price, stock, category_id } = req.body;
         const { id } = req.params;
 
-        const product = await Category.findOne({
+        let newImagePath = null;
+        if (req.file) {
+            newImagePath = `/uploads/${req.file.filename}`;
+        }
+
+        const product = await Product.findOne({
             where: {
                 id,
                 is_deleted: false,
@@ -79,7 +67,14 @@ exports.updateProduct = async (req, res) => {
         });
 
         if (!product) {
+            // If upload happened but product not found, delete the uploaded file to avoid junk
+            if (newImagePath) deleteFile(newImagePath);
             return response.error(res, 3002, 404);
+        }
+
+        // === DELETE OLD IMAGE IF NEW ONE IS UPLOADED ===
+        if (newImagePath && product.image) {
+            deleteFile(product.image);
         }
 
         await product.update({
@@ -87,7 +82,7 @@ exports.updateProduct = async (req, res) => {
             description: description ?? product.description,
             price: price ?? product.price,
             stock: stock ?? product.stock,
-            image: image ?? product.image,
+            image: newImagePath ?? product.image, // Use new image or keep old one
             category_id: category_id ?? product.category_id
         });
 
@@ -99,27 +94,10 @@ exports.updateProduct = async (req, res) => {
 };
 
 exports.deleteProduct = async (req, res) => {
-    // try {
-    //     const product = await Product.findOneAndUpdate(
-    //         { _id: req.params.id, deletedAt: null },
-    //         { deletedAt: new Date() },
-    //         { new: true }
-    //     );
-
-    //     if (!product) {
-    //         return res.status(404).json({ message: "Product not found" });
-    //     }
-
-    //     res.json({ message: "Product deleted successfully" });
-    // } catch (error) {
-    //     console.error("UPDATE PRODUCT ERROR:", error);
-    //     res.status(500).json({ message: "Server error" });
-    // }
-
     try {
         const { id } = req.params;
 
-        const product = await Category.findOne({
+        const product = await Product.findOne({
             where: {
                 id,
                 is_deleted: false,
@@ -128,6 +106,11 @@ exports.deleteProduct = async (req, res) => {
 
         if (!product) {
             return response.error(res, 3002, 404);
+        }
+
+        // === DELETE IMAGE FROM UPLOADS FOLDER ===
+        if (product.image) {
+            deleteFile(product.image);
         }
 
         await product.update({ is_deleted: true });
@@ -140,20 +123,6 @@ exports.deleteProduct = async (req, res) => {
 };
 
 exports.getAllProducts = async (req, res) => {
-    // try {
-    //     const page = parseInt(req.query.page) || 1;
-    //     const limit = 15;
-    //     const skip = (page - 1) * limit;
-
-    //     const products = await Product.find({ deletedAt: null })
-    //         .skip(skip)
-    //         .limit(limit);
-
-    //     res.json(products);
-    // } catch (err) {
-    //     res.status(500).json({ message: "Server error" });
-    // }
-
     try {
         const { page, limit, offset } = getPaginationMetadata(
             req.query.page,
@@ -164,6 +133,10 @@ exports.getAllProducts = async (req, res) => {
             where: { is_deleted: false },
             limit,
             offset,
+            include: [{
+                model: Category,
+                attributes: ['category_name']
+            }],
             order: [["created_at", "DESC"]],
         });
 
@@ -184,7 +157,7 @@ exports.getProductById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const product = await Category.findOne({
+        const product = await Product.findOne({
             where: {
                 id,
                 is_deleted: false,
@@ -192,7 +165,7 @@ exports.getProductById = async (req, res) => {
         });
 
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            return response.error(res, 3002, 404);
         }
 
         return response.success(res, null, product, 200);
@@ -204,7 +177,7 @@ exports.getProductById = async (req, res) => {
 
 exports.getProductBySellerId = async (req, res) => {
     try {
-        const { seller_id } = req.seller;
+        const { id } = req.params;
 
         const { page, limit, offset } = getPaginationMetadata(
             req.query.page,
@@ -213,7 +186,34 @@ exports.getProductBySellerId = async (req, res) => {
 
         const products = await Product.findAndCountAll({
             where: {
-                seller_id,
+                seller_id: id,
+                is_deleted: false,
+            },
+            limit,
+            offset,
+            order: [["created_at", "DESC"]],
+        });
+
+        const paginatedResponse = getPaginatedResponse(products, page, limit);
+        return response.success(res, null, paginatedResponse, 200);
+    } catch (error) {
+        console.error("Error: ", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getProductByCategory = async (req, res) => {
+    try {
+        const { id } = req.params; // Ensure route is /getByCategory/:id
+
+        const { page, limit, offset } = getPaginationMetadata(
+            req.query.page,
+            req.query.limit
+        );
+
+        const products = await Product.findAndCountAll({
+            where: {
+                category_id: id,
                 is_deleted: false,
             },
             limit,
@@ -233,84 +233,3 @@ exports.getProductBySellerId = async (req, res) => {
         return response.error(res, 9999)
     }
 };
-
-exports.searchProducts = async (req, res) => {
-    try {
-        const { title, category } = req.query;
-
-        const page = parseInt(req.query.page) || 1;
-        const limit = 15;
-        const skip = (page - 1) * limit;
-
-        const filter = { deletedAt: null };
-
-        if (title) {
-            filter.title = { $regex: title, $options: "i" };
-        }
-
-        if (category) {
-            const categories = await Category.find({
-                name: { $regex: category, $options: "i" },
-                deletedAt: null
-            }).select("_id");
-
-            if (!categories.length) {
-                return res.json([]);
-            }
-
-            const categoryIds = categories.map(c => c._id);
-            filter.product_category_id = { $in: categoryIds };
-        }
-
-        const products = await Product.find(filter)
-            .populate("product_category_id", "name")
-            .skip(skip)
-            .limit(limit);
-
-        res.json(products);
-    } catch (error) {
-        console.error("SEARCH PRODUCTS ERROR:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-};
-
-// exports.searchProducts = async (req, res) => {
-//   try {
-//     const { title, category } = req.query;
-
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = 15;
-//     const skip = (page - 1) * limit;
-
-//     const query = { deletedAt: null };
-
-//     if (title) {
-//       query.title = { $regex: title, $options: "i" };
-//     }
-
-//     if (category) {
-//       const categories = await Category.find({
-//         name: { $regex: category, $options: "i" },
-//         deletedAt: null
-//       }).select("_id");
-
-//       const categoryIds = categories.map(c => c._id);
-
-//       if (categoryIds.length) {
-//         query.product_category_id = { $in: categoryIds };
-//       } else {
-//         return res.json([]);
-//       }
-//     }
-
-//     const products = await Product.find(query)
-//       .populate("product_category_id", "name")
-//       .skip(skip)
-//       .limit(limit);
-
-//     res.json(products);
-//   } catch (error) {
-//     console.error("SEARCH PRODUCT ERROR:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };

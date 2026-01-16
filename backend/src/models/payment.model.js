@@ -29,6 +29,16 @@ const Payment = sequelize.define(
             },
         },
 
+        refunded_amount: {
+            type: DataTypes.DECIMAL(10, 2),
+            defaultValue: 0.00,
+        },
+
+        payment_status: {
+            type: DataTypes.ENUM("Paid", "Refunded", "Partially_Refunded"),
+            defaultValue: "Paid",
+        },
+
         is_deleted: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,

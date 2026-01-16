@@ -1,9 +1,9 @@
 require("dotenv").config();
+// require("./cron");
+require("./models");
 
 const app = require("./app");
 const sequelize = require("./config/sequelize");
-
-require("./models");
 
 const PORT = process.env.PORT || 5000;
 

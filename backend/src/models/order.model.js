@@ -18,6 +18,18 @@ const Order = sequelize.define(
             },
         },
 
+        amount: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false,
+            defaultValue: 0.00
+        },
+
+        address: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+            defaultValue: "defaultValue"
+        },
+
         is_deleted: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
