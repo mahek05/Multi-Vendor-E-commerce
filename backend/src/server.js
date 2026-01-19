@@ -1,5 +1,5 @@
 require("dotenv").config();
-// require("./cron");
+require("./cron");
 require("./models");
 
 const app = require("./app");

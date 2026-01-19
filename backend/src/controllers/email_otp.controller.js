@@ -8,11 +8,6 @@ exports.send_otp = async (req, res) => {
     try {
         const { email } = req.body;
 
-        if (!email) {
-            return response.error(res, 9000, 400);
-        }
-
-        // check for existing unexpired OTP
         const existingOtp = await EmailOtp.findOne({
             where: {
                 email,
@@ -22,11 +17,23 @@ exports.send_otp = async (req, res) => {
                 },
             },
             order: [["created_at", "DESC"]],
-        }); 
+        });
 
         if (existingOtp) {
             return response.error(res, 1018, 429);
         }
+        
+        const recentlyVerified = await EmailOtp.findOne({
+            where: {
+                email,
+                is_used: true
+            }
+        });
+
+        if (recentlyVerified) {
+            return response.error(res, 1022, 429);
+        }
+
 
         const otp = crypto.randomInt(100000, 999999).toString();
 
@@ -52,10 +59,6 @@ exports.send_otp = async (req, res) => {
 exports.verify_otp = async (req, res) => {
     try {
         const { email, otp } = req.body;
-
-        if (!email || !otp) {
-            return response.error(res, 9000, 400);
-        }
 
         const record = await EmailOtp.findOne({
             where: {

@@ -19,6 +19,7 @@ router.put(
 router.get(
     "/seller/history",
     verifySeller,
+    verifySellerApproved,
     orderItemController.sellerOrderHistory
 );
 
@@ -34,10 +35,10 @@ router.post(
     orderItemController.requestReturn
 );
 
-router.post(
-    "/refund/:order_item_id",
-    verifyAdmin,
-    refundController.refundOrderItem
-);
+// router.post(
+//     "/refund/:order_item_id",
+//     verifyAdmin,
+//     refundController.refundOrderItem
+// );
 
 module.exports = router;

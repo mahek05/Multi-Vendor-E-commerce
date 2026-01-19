@@ -1,7 +1,8 @@
 const Admin = require("../models/admin.model");
 const AuthToken = require("../models/auth_token.model");
 const EmailOtp = require("../models/email_otp.model");
-const Seller = require("../models/seller.model")
+const Seller = require("../models/seller.model");
+const User = require("../models/user.model")
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
@@ -17,10 +18,6 @@ exports.signup = async (req, res) => {
     try {
         const { email, password, name } = req.body;
 
-        if (!email || !password || !name) {
-            return response.error(res, 9000, 400);
-        }
-
         const otpRecord = await EmailOtp.findOne({
             where: {
                 email,
@@ -30,17 +27,17 @@ exports.signup = async (req, res) => {
         });
 
         if (!otpRecord) {
-            return response.error(res, 1017, 403); // email not verified
+            return response.error(res, 1017, 403);
         }
 
         const existingAdmin = await Admin.findOne({ where: { email } });
 
         if (existingAdmin && existingAdmin.is_deleted) {
-            return response.error(res, 1009, 403); // deactivated
+            return response.error(res, 1009, 403);
         }
 
         if (existingAdmin) {
-            return response.error(res, 1003, 409); // already registered
+            return response.error(res, 1003, 409);
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -64,10 +61,6 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return response.error(res, 1004, 400);
-        }
 
         const admin = await Admin.findOne({
             where: { email },
@@ -266,6 +259,33 @@ exports.getSeller = async (req, res) => {
 
         const paginatedResponse = getPaginatedResponse(
             sellers,
+            page,
+            limit
+        );
+
+        return response.success(res, null, paginatedResponse, 200);
+    } catch (error) {
+        console.error("Error:", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getUser = async (req, res) => {
+    try {
+        const { page, limit, offset } = getPaginationMetadata(
+            req.query.page,
+            req.query.limit
+        );
+
+        const user = await User.findAndCountAll({
+            where: { is_deleted: false },
+            limit,
+            offset,
+            order: [["created_at", "DESC"]],
+        });
+
+        const paginatedResponse = getPaginatedResponse(
+            user,
             page,
             limit
         );

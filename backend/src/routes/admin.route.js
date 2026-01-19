@@ -5,14 +5,23 @@ const adminController = require("../controllers/admin.controller");
 const { verifyAdmin } = require("../middlewares/auth.middleware");
 const { loginRateLimit } = require("../middlewares/rate_limit.middleware");
 
+const validate = require("../middlewares/validate.middleware");
+const {
+    adminSignupSchema,
+    adminLoginSchema,
+    adminUpdateSchema
+} = require("../validators/admin.validator")
+
 router.post(
     "/signup",
+    validate(adminSignupSchema),
     adminController.signup
 );
 
 router.post(
     "/login",
     loginRateLimit,
+    validate(adminLoginSchema),
     adminController.login
 );
 
@@ -30,6 +39,7 @@ router.get(
 router.put(
     "/profile",
     verifyAdmin,
+    validate(adminUpdateSchema),
     adminController.updateProfile
 );
 

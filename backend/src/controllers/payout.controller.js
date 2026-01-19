@@ -21,6 +21,10 @@ exports.processPayouts = async (req, res) => {
             ],
         });
 
+        if (payouts.length === 0) {
+            return response.error(res, 5006, 404);
+        }
+
         let paid = 0;
 
         for (const payout of payouts) {

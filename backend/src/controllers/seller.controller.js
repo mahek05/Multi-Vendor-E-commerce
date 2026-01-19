@@ -7,14 +7,10 @@ const response = require('../helpers');
 
 /**
  * Seller Signup
- */
+**/
 exports.signup = async (req, res) => {
     try {
-        const { name, email, password, address, phone_number } = req.body;
-
-        if (!name || !email || !password) {
-            return response.error(res, 9000, 400);
-        }
+        const { name, email, password, address, phone_number, stripe_account_id } = req.body;
 
         const otpRecord = await EmailOtp.findOne({
             where: {
@@ -25,7 +21,7 @@ exports.signup = async (req, res) => {
         });
 
         if (!otpRecord) {
-            return response.error(res, 1017, 403); // email not verified
+            return response.error(res, 1017, 403);
         }
 
         const existingSeller = await Seller.findOne({ where: { email } });
@@ -46,6 +42,7 @@ exports.signup = async (req, res) => {
             password: hashedPassword,
             address,
             phone_number,
+            stripe_account_id
         });
 
         return response.success(res, 1001, null, 201);
@@ -61,10 +58,6 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return response.error(res, 1004, 400);
-        }
 
         const seller = await Seller.findOne({
             where: { email },
@@ -174,18 +167,19 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const { seller_id } = req.seller;
-        const { name, address, phone_number } = req.body;
+        const { name, address, phone_number, stripe_account_id } = req.body;
 
         const seller = await Seller.findOne({ where: { id: seller_id } });
 
         if (!seller) {
-            return response.error(res, 1006, 404); // Seller not found
+            return response.error(res, 1006, 404);
         }
 
         await seller.update({
             name: name ?? seller.name,
             address: address ?? seller.address,
             phone_number: phone_number ?? seller.phone_number,
+            stripe_account_id: stripe_account_id ?? seller.stripe_account_id
         });
 
         return response.success(res, 1011, seller, 200);
@@ -207,7 +201,6 @@ exports.deactivateProfile = async (req, res) => {
 
         await seller.update({ is_deleted: true });
 
-        // deactivate all tokens
         await AuthToken.update(
             { is_active: false },
             { where: { entity_id: seller_id, entity_type: "SELLER" } }

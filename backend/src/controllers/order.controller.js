@@ -1,34 +1,26 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const sequelize = require("../config/sequelize");
-
 const Order = require("../models/order.model");
 const OrderItem = require("../models/order_item.model");
 const Payment = require("../models/payment.model");
 const CartItem = require("../models/cart_item.model");
 const Product = require("../models/product.model");
-// const Seller = require("../models/seller.model");
 const Payout = require("../models/payout.model");
-
 const response = require("../helpers");
 
 const PLATFORM_FEE_PERCENT = 0.10;
 
-//Checkout
 exports.checkout = async (req, res) => {
     const transaction = await sequelize.transaction();
-
     try {
         const { user_id } = req.user;
         const { payment_method_id, address } = req.body;
 
-        if (!payment_method_id || !address) {
-            await transaction.rollback();
-            return response.error(res, 9000, 400);
-        }
-
         const cart_items = await CartItem.findAll({
             where: { user_id },
-            include: [{ model: Product }],
+            include: [{
+                model: Product
+            }],
             transaction
         });
 
@@ -38,38 +30,6 @@ exports.checkout = async (req, res) => {
         }
 
         let total_amount = 0;
-        for (const item of cart_items) {
-            const price = Number(item.product.price);
-            total_amount += price * item.quantity;
-        }
-
-        const payment_intent = await stripe.paymentIntents.create({
-            amount: Math.round(total_amount * 100),
-            currency: "inr",
-            payment_method: payment_method_id,
-            confirm: true,
-            automatic_payment_methods: {
-                enabled: true,
-                allow_redirects: "never",
-            },
-        });
-
-        if (payment_intent.status !== "succeeded") {
-            await transaction.rollback();
-            return response.error(res, 5002, 400);
-        }
-
-        const order = await Order.create({
-            user_id,
-            total_amount,
-            address
-        }, { transaction });
-
-        const payment = await Payment.create({
-            order_id: order.id,
-            gateway_payment_id: payment_intent.id,
-            amount: total_amount,
-        }, { transaction });
 
         for (const item of cart_items) {
             const product = await Product.findOne({
@@ -86,25 +46,58 @@ exports.checkout = async (req, res) => {
             const currentStock = Number(product.stock);
             const quantity = Number(item.quantity);
 
-            // if (isNaN(currentStock) || isNaN(quantity)) {
-            //     throw new Error(`Invalid data: Stock=${currentStock}, Qty=${quantity}`);
-            // }
-
-            // if (currentStock < quantity) {
-            //     throw new Error(`Insufficient stock for ${product.product_name}`);
-            // }
+            if (currentStock < quantity) {
+                throw new Error(`Insufficient stock for ${product.product_name}. Only ${currentStock} left.`);
+            }
 
             await product.update({
                 stock: currentStock - quantity
             }, { transaction });
 
-            const unitPrice = Number(item.product.price);
-            
+            total_amount += Number(item.product.price) * quantity;
+        }
+
+        let payment_intent;
+        try {
+            payment_intent = await stripe.paymentIntents.create({
+                amount: Math.round(total_amount * 100),
+                currency: "inr",
+                payment_method: payment_method_id,
+                confirm: true,
+                automatic_payment_methods: {
+                    enabled: true,
+                    allow_redirects: "never",
+                },
+            });
+        } catch (stripeError) {
+            throw new Error(`Payment Failed: ${stripeError.message}`);
+        }
+
+        if (payment_intent.status !== "succeeded") {
+            throw new Error("Payment not succeeded");
+        }
+
+        const order = await Order.create({
+            user_id,
+            total_amount,
+            address
+        }, { transaction });
+
+        const payment = await Payment.create({
+            order_id: order.id,
+            gateway_payment_id: payment_intent.id,
+            amount: total_amount,
+        }, { transaction });
+
+        for (const item of cart_items) {
+            const quantity = Number(item.quantity);
+            const Amount = Number(item.product.price) * quantity;
+
             const order_item = await OrderItem.create({
                 order_id: order.id,
                 product_id: item.product_id,
                 quantity: quantity,
-                price: unitPrice, 
+                price: Amount,
             }, { transaction });
 
             const seller_id = item.product.seller_id;
@@ -159,36 +152,3 @@ exports.orderHistory = async (req, res) => {
         return response.error(res, 9999);
     }
 };
-
-// exports.refundOrder = async (req, res) => {
-//     try {
-//         const { order_id } = req.params;
-
-//         const payment = await Payment.findOne({ where: { order_id } });
-
-//         if (!payment) {
-//             return response.error(res, 9001, 404);
-//         }
-
-//         const refund = await stripe.refunds.create({
-//             payment_intent: payment.gateway_payment_id,
-//         });
-
-//         if (refund.status === "succeeded") {
-//             await Order.update(
-//                 { is_deleted: true },
-//                 { where: { id: order_id } }
-//             );
-
-//             await Payout.update(
-//                 { status: "Refunded" },
-//                 { where: { payment_id: payment.id, status: "Pending" } }
-//             );
-//         }
-
-//         return response.success(res, 5005, refund, 200);
-//     } catch (error) {
-//         console.error("Refund error:", error);
-//         return response.error(res, 9999);
-//     }
-// };

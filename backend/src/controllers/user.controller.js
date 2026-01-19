@@ -5,17 +5,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
 
-/**
- * User Signup
- */
 exports.signup = async (req, res) => {
     try {
         const { name, email, password, address, phone_number } = req.body;
-
-        if (!name || !email || !password) {
-            return response.error(res, 9000, 400);
-        }
-
+        
         const otpRecord = await EmailOtp.findOne({
             where: {
                 email,
@@ -25,7 +18,7 @@ exports.signup = async (req, res) => {
         });
 
         if (!otpRecord) {
-            return response.error(res, 1017, 403); // email not verified
+            return response.error(res, 1017, 403);
         }
 
         const existingUser = await User.findOne({ where: { email } });
@@ -37,7 +30,6 @@ exports.signup = async (req, res) => {
         if (existingUser) {
             return response.error(res, 1003, 409);
         }
-
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -56,16 +48,9 @@ exports.signup = async (req, res) => {
     }
 };
 
-/**
- * User Login
- */
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return response.error(res, 1004, 400);
-        }
 
         const user = await User.findOne({
             where: { email },
@@ -126,9 +111,6 @@ exports.login = async (req, res) => {
     }
 };
 
-/**
- * User Logout
- */
 exports.logout = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -168,10 +150,6 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-
-/**
- * Update profile
- */
 exports.updateProfile = async (req, res) => {
     try {
         const { user_id } = req.user;
@@ -180,7 +158,7 @@ exports.updateProfile = async (req, res) => {
         const user = await User.findOne({ where: { id: user_id } });
 
         if (!user) {
-            return response.error(res, 1006, 404); // User not found
+            return response.error(res, 1006, 404);
         }
 
         await user.update({
@@ -208,7 +186,6 @@ exports.deactivateProfile = async (req, res) => {
 
         await user.update({ is_deleted: true });
 
-        // deactivate all tokens
         await AuthToken.update(
             { is_active: false },
             { where: { entity_id: user_id, entity_type: "USER" } }

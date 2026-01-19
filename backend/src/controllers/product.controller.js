@@ -28,7 +28,6 @@ exports.createProduct = async (req, res) => {
 
         let imagePath = null;
 
-        // FIXED: Correctly handle image variable
         if (req.file) {
             imagePath = `/uploads/${req.file.filename}`;
         }
@@ -36,7 +35,7 @@ exports.createProduct = async (req, res) => {
         await Product.create({
             product_name,
             description,
-            image: imagePath, // Use the variable we defined
+            image: imagePath,
             category_id,
             price,
             stock,
@@ -67,12 +66,10 @@ exports.updateProduct = async (req, res) => {
         });
 
         if (!product) {
-            // If upload happened but product not found, delete the uploaded file to avoid junk
             if (newImagePath) deleteFile(newImagePath);
             return response.error(res, 3002, 404);
         }
 
-        // === DELETE OLD IMAGE IF NEW ONE IS UPLOADED ===
         if (newImagePath && product.image) {
             deleteFile(product.image);
         }
@@ -82,7 +79,7 @@ exports.updateProduct = async (req, res) => {
             description: description ?? product.description,
             price: price ?? product.price,
             stock: stock ?? product.stock,
-            image: newImagePath ?? product.image, // Use new image or keep old one
+            image: newImagePath ?? product.image,
             category_id: category_id ?? product.category_id
         });
 
@@ -108,7 +105,6 @@ exports.deleteProduct = async (req, res) => {
             return response.error(res, 3002, 404);
         }
 
-        // === DELETE IMAGE FROM UPLOADS FOLDER ===
         if (product.image) {
             deleteFile(product.image);
         }
@@ -204,7 +200,7 @@ exports.getProductBySellerId = async (req, res) => {
 
 exports.getProductByCategory = async (req, res) => {
     try {
-        const { id } = req.params; // Ensure route is /getByCategory/:id
+        const { id } = req.params;
 
         const { page, limit, offset } = getPaginationMetadata(
             req.query.page,

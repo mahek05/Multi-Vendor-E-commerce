@@ -22,6 +22,7 @@ const MESSAGES = {
     '1019': 'Too many login attempts. Please try again later.',
     '1020': 'Seller account is not approved by admin.',
     '1021': "Seller status changed.",
+    '1022': 'User already verified.',
 
     //Category
     '2001': 'Category created successfully.',
@@ -46,7 +47,7 @@ const MESSAGES = {
     '5002': 'Payment failed.',
     '5003': 'Order placed.',
     '5004': 'Order history.',
-    '5005': 'Order refunded.',
+    '5005': 'Order Item refunded.',
     '5006': 'Order Item not found.',
     '5007': 'Order Item status updated.',
     '5008': 'Invalid input',
@@ -62,6 +63,7 @@ const MESSAGES = {
     '5018': 'Product can\'t be returned.',
     '5019': 'Can\'t return.',
     '5020': 'Return application has been submitted.',
+    '5021': 'Return Status updated.',
 
     // Common
     '9000': 'Please enter valid data!',

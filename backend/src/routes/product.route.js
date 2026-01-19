@@ -4,47 +4,55 @@ const router = express.Router();
 const productController = require("../controllers/product.controller");
 const { verifySeller, verifySellerApproved } = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/upload.middleware");
+const validate = require("../middlewares/validate.middleware");
+const {
+    createProductSchema,
+    updateProductSchema
+} = require("../validators/product.validator");
 
 router.post(
-  "/create", 
-  verifySeller, 
-  verifySellerApproved, 
-  upload.single("image"),
-  productController.createProduct
+    "/create",
+    verifySeller,
+    verifySellerApproved,
+    upload.single("image"),
+    validate(createProductSchema),
+    productController.createProduct
 );
 
 router.put(
-    "/update/:id", 
-    verifySeller, 
-    verifySellerApproved, 
+    "/update/:id",
+    verifySeller,
+    verifySellerApproved,
+    upload.single("image"),
+    validate(updateProductSchema),
     productController.updateProduct
 );
 
 router.delete(
-    "/delete/:id", 
-    verifySeller, 
-    verifySellerApproved, 
+    "/delete/:id",
+    verifySeller,
+    verifySellerApproved,
     productController.deleteProduct
 );
 
 router.get(
-    "/", 
+    "/",
     productController.getAllProducts
 );
 
 router.get(
-    "/getById/:id", 
+    "/getById/:id",
     productController.getProductById
 );
 
 router.get(
-    "/getBySellerId/:id", 
-    verifySeller, 
+    "/getBySellerId/:id",
+    verifySeller,
     productController.getProductBySellerId
 );
 
 router.get(
-    "/getByCategory/:id", 
+    "/getByCategory/:id",
     productController.getProductByCategory
 );
 

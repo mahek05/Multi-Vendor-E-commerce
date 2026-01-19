@@ -22,7 +22,7 @@ exports.createCartItem = async (req, res) => {
         console.error(error);
         return response.error(res, 9999);
     }
-}; ''
+};
 
 exports.updateCartItem = async (req, res) => {
     try {
