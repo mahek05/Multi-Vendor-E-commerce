@@ -48,6 +48,7 @@ router.get(
 router.get(
     "/getBySellerId/:id",
     verifySeller,
+    verifySellerApproved,
     productController.getProductBySellerId
 );
 

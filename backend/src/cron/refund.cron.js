@@ -1,7 +1,8 @@
 const cron = require("node-cron");
-const { refundOrderItem } = require("../controllers/refund.controller");
+const { refundOrderItems } = require("../controllers/refund.controller");
 
 console.log("refund.cron Working");
-cron.schedule("*/30 * * * *", async () => {
-    console.log("Running refund cron");
-});
+cron.schedule("0 0 * * *", async () => {
+    console.log("Running refund job");
+    await refundOrderItems();
+})

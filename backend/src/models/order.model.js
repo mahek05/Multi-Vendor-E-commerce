@@ -17,13 +17,7 @@ const Order = sequelize.define(
                 key: "id",
             },
         },
-
-        amount: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-            defaultValue: 0.00
-        },
-
+        
         address: {
             type: DataTypes.TEXT,
             allowNull: false,

@@ -61,4 +61,10 @@ router.get(
     adminController.getSeller
 );
 
+router.get(
+    "/getUser",
+    verifyAdmin,
+    adminController.getUser
+);
+
 module.exports = router;

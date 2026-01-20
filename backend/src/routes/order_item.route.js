@@ -2,17 +2,16 @@ const express = require("express");
 const router = express.Router();
 
 const orderItemController = require("../controllers/order_item.controller");
-const refundController = require("../controllers/refund.controller");
 const {
     verifySeller,
     verifySellerApproved,
-    verifyUser,
-    verifyAdmin
+    verifyUser
 } = require("../middlewares/auth.middleware");
 
 router.put(
     "/status/:id",
     verifySeller,
+    verifySellerApproved,
     orderItemController.updateStatus
 );
 
@@ -29,16 +28,10 @@ router.put(
     orderItemController.cancelOrderItem
 );
 
-router.post(
-    "/return",
+router.put(
+    "/return/:order_item_id",
     verifyUser,
     orderItemController.requestReturn
 );
-
-// router.post(
-//     "/refund/:order_item_id",
-//     verifyAdmin,
-//     refundController.refundOrderItem
-// );
 
 module.exports = router;

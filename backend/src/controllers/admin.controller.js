@@ -11,9 +11,6 @@ const {
     getPaginatedResponse
 } = require("../helpers/pagination");
 
-/**
- * Admin Signup
- */
 exports.signup = async (req, res) => {
     try {
         const { email, password, name } = req.body;
@@ -55,9 +52,6 @@ exports.signup = async (req, res) => {
     }
 };
 
-/**
- * Admin Login
- */
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -121,9 +115,6 @@ exports.login = async (req, res) => {
     }
 };
 
-/**
- * Admin Logout
- */
 exports.logout = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -143,9 +134,6 @@ exports.logout = async (req, res) => {
     }
 };
 
-/**
- * Admin Profile
- */
 exports.getProfile = async (req, res) => {
     try {
         const { admin_id } = req.admin;
@@ -200,7 +188,6 @@ exports.deactivateProfile = async (req, res) => {
 
         await admin.update({ is_deleted: true });
 
-        // deactivate all tokens
         await AuthToken.update(
             { is_active: false },
             { where: { entity_id: admin_id, entity_type: "ADMIN" } }
@@ -212,7 +199,6 @@ exports.deactivateProfile = async (req, res) => {
         return response.error(res, 9999);
     }
 };
-
 
 exports.sellerStatus = async (req, res) => {
     try {
@@ -278,7 +264,6 @@ exports.getUser = async (req, res) => {
         );
 
         const user = await User.findAndCountAll({
-            where: { is_deleted: false },
             limit,
             offset,
             order: [["created_at", "DESC"]],

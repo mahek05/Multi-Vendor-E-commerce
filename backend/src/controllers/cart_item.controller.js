@@ -1,4 +1,5 @@
 const CartItem = require("../models/cart_item.model");
+const Product = require("../models/product.model");
 const response = require("../helpers")
 const {
     getPaginationMetadata,
@@ -86,6 +87,12 @@ exports.getAllCartItem = async (req, res) => {
             limit,
             offset,
             order: [["created_at", "DESC"]],
+            include: [
+                {
+                    model: Product,
+                    attributes: ['product_name', 'image', 'price']
+                }
+            ]
         });
 
         const paginatedResponse = getPaginatedResponse(

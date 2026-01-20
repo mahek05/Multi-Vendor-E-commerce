@@ -110,14 +110,6 @@ exports.cancelOrderItem = async (req, res) => {
             return response.error(res, 9001, 404);
         }
 
-        const currentStock = Number(product.stock);
-        const qtyToRestore = Number(orderItem.quantity);
-
-        await product.update(
-            { stock: currentStock + qtyToRestore },
-            { transaction: t }
-        );
-
         await orderItem.update(
             { status: "Order Cancelled" },
             { transaction: t }
@@ -129,7 +121,7 @@ exports.cancelOrderItem = async (req, res) => {
         );
 
         await t.commit();
-        return response.success(res, 5011, { message: "Order cancelled & refunded" }, 200);
+        return response.success(res, 5011, { message: "Order cancelled" }, 200);
 
     } catch (error) {
         await t.rollback();
@@ -148,7 +140,10 @@ exports.requestReturn = async (req, res) => {
 
         const orderItem = await OrderItem.findOne({
             where: { id: order_item_id },
-            include: [{ model: Order }],
+            include: [{
+                model: Order,
+                required: true
+            }],
             transaction: t,
             lock: t.LOCK.UPDATE,
         });
@@ -196,37 +191,9 @@ exports.requestReturn = async (req, res) => {
     }
 };
 
-exports.returnRequestApproval = async (req, res) => {
-    try {
-        // const { seller_id } = req.seller;
-        const { id } = req.params;
-        const { status } = req.body
-
-        const order_item = await OrderItem.findOne({
-            where: {
-                id: id,
-                is_deleted: false,
-            },
-        });
-
-        if (!order_item) {
-            return response.error(res, 5006, 404);
-        }
-
-        await order_item.update({
-            status: status,
-        });
-
-        return response.success(res, 5021, null, 201);
-    } catch (error) {
-        console.error("Return Request Approval Error: ", error);
-        return response.error(res, 9999)
-    }
-};
-
 exports.sellerOrderHistory = async (req, res) => {
     try {
-        const seller_id = req.seller.id;
+        const { seller_id } = req.seller;
 
         const { page, limit, offset } = getPaginationMetadata(
             req.query.page,

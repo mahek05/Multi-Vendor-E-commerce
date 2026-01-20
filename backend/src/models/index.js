@@ -54,6 +54,10 @@ Product.belongsTo(Seller, { foreignKey: "seller_id" });
 Category.hasMany(Product, { foreignKey: "category_id" });
 Product.belongsTo(Category, { foreignKey: "category_id" });
 
+// OrderItem <-> Payout Relationship
+OrderItem.hasOne(Payout, { foreignKey: "order_item_id" });
+Payout.belongsTo(OrderItem, { foreignKey: "order_item_id" });
+
 const db = {
     sequelize,
     Admin,

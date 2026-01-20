@@ -32,6 +32,7 @@ exports.checkout = async (req, res) => {
         let total_amount = 0;
 
         for (const item of cart_items) {
+            total_amount += Number(item.product.price);
             const product = await Product.findOne({
                 where: { id: item.product_id, is_deleted: false },
                 attributes: { include: ["stock"] },
@@ -99,7 +100,7 @@ exports.checkout = async (req, res) => {
                 quantity: quantity,
                 price: Amount,
             }, { transaction });
-
+            const unitPrice = Number(item.product.price);
             const seller_id = item.product.seller_id;
             const item_total = unitPrice * quantity;
             const seller_share = item_total * (1 - PLATFORM_FEE_PERCENT);

@@ -19,10 +19,4 @@ router.get(
     orderController.orderHistory
 );
 
-// router.post(
-//     "/refund",
-//     verifyUser,
-//     orderController.refundOrder
-// );
-
 module.exports = router;

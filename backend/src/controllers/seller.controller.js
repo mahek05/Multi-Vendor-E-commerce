@@ -5,9 +5,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
 
-/**
- * Seller Signup
-**/
 exports.signup = async (req, res) => {
     try {
         const { name, email, password, address, phone_number, stripe_account_id } = req.body;
@@ -52,9 +49,6 @@ exports.signup = async (req, res) => {
     }
 };
 
-/**
- * Seller Login
- */
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -118,9 +112,6 @@ exports.login = async (req, res) => {
     }
 };
 
-/**
- * Seller Logout
- */
 exports.logout = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -160,10 +151,6 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-
-/**
- * Update profile
- */
 exports.updateProfile = async (req, res) => {
     try {
         const { seller_id } = req.seller;

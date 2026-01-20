@@ -1,7 +1,11 @@
 const { Op } = require("sequelize");
-const Payout = require("../models/payout.model")
+const Payout = require("../models/payout.model");
+const OrderItem = require("../models/order_item.model");
+const Product = require("../models/product.model");
+const Seller = require("../models/seller.model");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-exports.processPayouts = async (req, res) => {
+exports.processPayouts = async () => {
     try {
         const payouts = await Payout.findAll({
             where: {
@@ -22,7 +26,8 @@ exports.processPayouts = async (req, res) => {
         });
 
         if (payouts.length === 0) {
-            return response.error(res, 5006, 404);
+            console.log("No pending payouts found.");
+            return;
         }
 
         let paid = 0;
@@ -46,10 +51,10 @@ exports.processPayouts = async (req, res) => {
             paid++;
         }
 
-        return response.success(res, 200, { paid }, 200);
+        console.log(`Payouts Processed: ${paid}`);
+        return { paid };
 
     } catch (error) {
         console.error("Payout error:", error);
-        return response.error(res, 9999);
     }
 };
