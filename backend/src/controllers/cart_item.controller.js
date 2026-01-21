@@ -4,7 +4,7 @@ const response = require("../helpers")
 const {
     getPaginationMetadata,
     getPaginatedResponse
-} = require("../helpers/pagination");
+} = require("../helpers/pagination.helper");
 
 exports.createCartItem = async (req, res) => {
     try {

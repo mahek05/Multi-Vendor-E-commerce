@@ -1,7 +1,3 @@
-
-/***
- * Get pagination metadata
- */
 exports.getPaginationMetadata = (pageNo = 1, limitNo = 10) => {
     const page = parseInt(pageNo) || 1;
     const limit = parseInt(limitNo) || 10;
@@ -9,9 +5,6 @@ exports.getPaginationMetadata = (pageNo = 1, limitNo = 10) => {
     return { page, limit, offset };
 };
 
-/***
- * Get paginated response
- */
 exports.getPaginatedResponse = (data, page, limit) => {
     return {
         page_data: data.rows,

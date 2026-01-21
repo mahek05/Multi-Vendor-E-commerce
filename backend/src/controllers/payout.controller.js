@@ -3,7 +3,7 @@ const Payout = require("../models/payout.model");
 const OrderItem = require("../models/order_item.model");
 const Product = require("../models/product.model");
 const Seller = require("../models/seller.model");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const {createTransfer} = require("../helpers/stripe.helper");
 
 exports.processPayouts = async () => {
     try {
@@ -37,13 +37,10 @@ exports.processPayouts = async () => {
 
             if (!seller || !seller.stripe_account_id) continue;
 
-            const transfer = await stripe.transfers.create({
-                amount: Math.round(payout.amount * 100),
-                currency: "inr",
-                destination: seller.stripe_account_id,
-                transfer_group: `ORDER_ITEM_${payout.order_item_id}`,
-            });
+            const transfer_group = `ORDER_ITEM_${payout.order_item_id}`
 
+            await createTransfer(payout.amount, seller.stripe_account_id, transfer_group)
+        
             await payout.update({
                 status: "Paid",
             });

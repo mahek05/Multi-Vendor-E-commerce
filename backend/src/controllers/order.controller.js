@@ -1,4 +1,3 @@
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const sequelize = require("../config/sequelize");
 const Order = require("../models/order.model");
 const OrderItem = require("../models/order_item.model");
@@ -7,6 +6,7 @@ const CartItem = require("../models/cart_item.model");
 const Product = require("../models/product.model");
 const Payout = require("../models/payout.model");
 const response = require("../helpers");
+const createPaymentIntent = require("../helpers/stripe.helper");
 
 const PLATFORM_FEE_PERCENT = 0.10;
 
@@ -58,25 +58,7 @@ exports.checkout = async (req, res) => {
             total_amount += Number(item.product.price) * quantity;
         }
 
-        let payment_intent;
-        try {
-            payment_intent = await stripe.paymentIntents.create({
-                amount: Math.round(total_amount * 100),
-                currency: "inr",
-                payment_method: payment_method_id,
-                confirm: true,
-                automatic_payment_methods: {
-                    enabled: true,
-                    allow_redirects: "never",
-                },
-            });
-        } catch (stripeError) {
-            throw new Error(`Payment Failed: ${stripeError.message}`);
-        }
-
-        if (payment_intent.status !== "succeeded") {
-            throw new Error("Payment not succeeded");
-        }
+        const payment_intent = await createPaymentIntent(total_amount, payment_method_id, "inr");
 
         const order = await Order.create({
             user_id,

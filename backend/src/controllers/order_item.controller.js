@@ -1,13 +1,13 @@
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const sequelize = require("../config/sequelize");
 const OrderItem = require("../models/order_item.model");
-const Payment = require("../models/payment.model");
 const Payout = require("../models/payout.model");
 const Product = require("../models/product.model");
 const Order = require("../models/order.model");
-const Seller = require("../models/seller.model")
 const response = require("../helpers");
-const { getPaginationMetadata, getPaginatedResponse } = require("../helpers/pagination");
+const {
+    getPaginationMetadata,
+    getPaginatedResponse
+} = require("../helpers/pagination.helper");
 
 const STATUS_FLOW = {
     "Order Placed": "Shipped",

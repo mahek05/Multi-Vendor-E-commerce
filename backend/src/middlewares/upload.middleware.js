@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({
+exports.upload = multer({
     storage,
     limits: { fileSize: 2 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
@@ -28,4 +28,15 @@ const upload = multer({
     }
 });
 
-module.exports = upload;
+exports.deleteFile = (filePath) => {
+    if (!filePath) return;
+    const fullPath = path.join(__dirname, "..", "..", filePath);
+
+    fs.unlink(fullPath, (err) => {
+        if (err) {
+            console.error(`Failed to delete file: ${fullPath}`, err);
+        } else {
+            console.log(`Successfully deleted file: ${fullPath}`);
+        }
+    });
+};

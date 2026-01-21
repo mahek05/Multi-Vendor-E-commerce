@@ -1,6 +1,6 @@
-const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
+const transporter = require("../../config/email");
 
 exports.send_otp_email = async (email, otp) => {
     try {
@@ -8,16 +8,6 @@ exports.send_otp_email = async (email, otp) => {
         let html = fs.readFileSync(templatePath, "utf8");
 
         html = html.replace("{{OTP}}", otp);
-
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false,
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-        });
 
         await transporter.sendMail({
             from: `"E-Commerce App" <${process.env.SMTP_USER}>`,

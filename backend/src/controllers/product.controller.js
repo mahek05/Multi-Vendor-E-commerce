@@ -1,25 +1,11 @@
-const fs = require("fs");
-const path = require("path");
 const Product = require("../models/product.model");
 const Category = require("../models/category.model");
 const response = require("../helpers");
 const {
     getPaginationMetadata,
     getPaginatedResponse
-} = require("../helpers/pagination");
-
-const deleteFile = (filePath) => {
-    if (!filePath) return;
-    const fullPath = path.join(__dirname, "..", "..", filePath);
-
-    fs.unlink(fullPath, (err) => {
-        if (err) {
-            console.error(`Failed to delete file: ${fullPath}`, err);
-        } else {
-            console.log(`Successfully deleted file: ${fullPath}`);
-        }
-    });
-};
+} = require("../helpers/pagination.helper");
+const { deleteFile } = require("../middlewares/upload.middleware");
 
 exports.createProduct = async (req, res) => {
     try {

@@ -3,7 +3,7 @@ const response = require("../helpers");
 const {
     getPaginationMetadata,
     getPaginatedResponse
-} = require("../helpers/pagination");
+} = require("../helpers/pagination.helper");
 
 exports.createCategory = async (req, res) => {
     try {

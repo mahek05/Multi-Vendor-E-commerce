@@ -3,7 +3,9 @@ const router = express.Router();
 
 const productController = require("../controllers/product.controller");
 const { verifySeller, verifySellerApproved } = require("../middlewares/auth.middleware");
-const upload = require("../middlewares/upload.middleware");
+const {
+    upload
+} = require("../middlewares/upload.middleware");
 const validate = require("../middlewares/validate.middleware");
 const {
     createProductSchema,

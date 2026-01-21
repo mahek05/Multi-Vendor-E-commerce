@@ -5,6 +5,7 @@ const OrderItem = require("../models/order_item.model");
 const Payment = require("../models/payment.model");
 const Product = require("../models/product.model");
 const Payout = require("../models/payout.model");
+const {createRefund} = require("../helpers/stripe.helper")
 
 exports.refundOrderItems = async () => {
     const transaction = await sequelize.transaction();
@@ -64,6 +65,8 @@ exports.refundOrderItems = async () => {
                 console.error(`Stripe Error: ${stripeError.message}`);
                 throw stripeError;
             }
+
+            await createRefund(gateway_payment_id, amount);
 
             await orderItem.update({
                 status: "Refunded",

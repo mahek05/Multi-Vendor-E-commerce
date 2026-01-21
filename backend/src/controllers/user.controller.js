@@ -4,11 +4,15 @@ const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
+const {
+    generateToken,
+    deactivateToken
+} = require("../helpers/token.helper");
 
 exports.signup = async (req, res) => {
     try {
         const { name, email, password, address, phone_number } = req.body;
-        
+
         const otpRecord = await EmailOtp.findOne({
             where: {
                 email,
@@ -70,41 +74,13 @@ exports.login = async (req, res) => {
             return response.error(res, 1007, 401);
         }
 
-        await AuthToken.update(
-            { is_active: false },
-            { where: { entity_id: user.id, entity_type: "USER" } }
-        );
+        const token = await generateToken(user.id, "USER");
 
-        const accessToken = jwt.sign(
-            { entity_id: user.id, role: "USER" },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
-
-        const refreshToken = jwt.sign(
-            { entity_id: user.id, role: "USER" },
-            process.env.JWT_REFRESH_SECRET,
-            { expiresIn: "7d" }
-        );
-
-        const refreshExpiry = new Date();
-        refreshExpiry.setDate(refreshExpiry.getDate() + 7);
-
-        await AuthToken.create({
-            entity_id: user.id,
-            entity_type: "USER",
-            access_token: accessToken,
-            refresh_token: refreshToken,
-            expires_at: refreshExpiry,
-            is_active: true,
-        });
-
-        return response.success(
-            res,
-            1002,
-            { access_token: accessToken, refresh_token: refreshToken },
-            200
-        );
+        return response.success(res, 1002, {
+            entity_id: token.entity_id,
+            access_token: token.access_token,
+            refresh_token: token.refresh_token
+        }, 200);
     } catch (error) {
         console.error(error);
         return response.error(res, 9999);
@@ -118,10 +94,7 @@ exports.logout = async (req, res) => {
             return response.error(res, 1008, 401);
         }
 
-        await AuthToken.update(
-            { is_active: false },
-            { where: { access_token: token } }
-        );
+        await deactivateToken(token);
 
         return response.success(res, 1005, null, 200);
     } catch (error) {
