@@ -17,7 +17,7 @@ exports.processPayouts = async () => {
                     where: {
                         status: "Delivered",
                         payout_eligible_at: {
-                            [Op.gte]: new Date(),
+                            [Op.lte]: new Date(),
                         },
                     },
                     include: [{ model: Product }],
