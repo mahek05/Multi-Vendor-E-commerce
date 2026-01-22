@@ -5,7 +5,7 @@ const OrderItem = require("../models/order_item.model");
 const Payment = require("../models/payment.model");
 const Product = require("../models/product.model");
 const Payout = require("../models/payout.model");
-const {createRefund} = require("../helpers/stripe.helper")
+const { createRefund } = require("../helpers/stripe.helper")
 
 exports.refundOrderItems = async () => {
     const transaction = await sequelize.transaction();
@@ -36,42 +36,24 @@ exports.refundOrderItems = async () => {
                 lock: transaction.LOCK.UPDATE
             });
 
-            if (!payment) {
-                console.error(`Payment missing for order_item ${orderItem.id}`);
-                continue;
-            }
-
-            const refundAmount = Number(orderItem.price);
-
             const payout = await Payout.findOne({
                 where: { order_item_id: orderItem.id },
                 transaction,
                 lock: transaction.LOCK.UPDATE
             });
 
-            if (payout && payout.status === "Paid") {
-                console.error(`Seller already paid for ${orderItem.id}, cannot auto-refund.`);
+            if (!payment || payout && payout.status === "Paid") {
+                console.error(`Not eligible for refund ${orderItem.id}.`);
                 continue;
             }
 
-            try {
-                await stripe.refunds.create({
-                    payment_intent: payment.gateway_payment_id,
-                    amount: Math.round(refundAmount * 100),
-                    reason: "requested_by_customer",
-                });
+            const refundAmount = Number(orderItem.price);
 
+            try {
+                await createRefund(payment.gateway_payment_id, refundAmount);
             } catch (stripeError) {
                 console.error(`Stripe Error: ${stripeError.message}`);
-                throw stripeError;
             }
-
-            await createRefund(gateway_payment_id, amount);
-
-            await orderItem.update({
-                status: "Refunded",
-                returned_on: new Date(),
-            }, { transaction });
 
             await orderItem.update({
                 status: "Refunded",
@@ -83,9 +65,7 @@ exports.refundOrderItems = async () => {
             await payment.update({
                 refunded_amount: updatedRefunded,
                 payment_status:
-                    updatedRefunded >= Number(payment.amount)
-                        ? "Refunded"
-                        : "Partially_Refunded"
+                    updatedRefunded >= Number(payment.amount) ? "Refunded" : "Partially_Refunded"
             }, { transaction });
 
             const product = await Product.findOne({

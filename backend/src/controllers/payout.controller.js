@@ -17,7 +17,7 @@ exports.processPayouts = async () => {
                     where: {
                         status: "Delivered",
                         payout_eligible_at: {
-                            [Op.lte]: new Date(),
+                            [Op.gte]: new Date(),
                         },
                     },
                     include: [{ model: Product }],
@@ -39,7 +39,11 @@ exports.processPayouts = async () => {
 
             const transfer_group = `ORDER_ITEM_${payout.order_item_id}`
 
-            await createTransfer(payout.amount, seller.stripe_account_id, transfer_group)
+            try {
+                await createTransfer(payout.amount, seller.stripe_account_id, transfer_group)
+            } catch (stripeError) {
+                console.error(`Stripe Error: ${stripeError.message}`);
+            }
         
             await payout.update({
                 status: "Paid",

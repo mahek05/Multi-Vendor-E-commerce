@@ -19,10 +19,9 @@ exports.createPaymentIntent = async (amount, payment_method, currency = "inr") =
     return payment_intent;
 };
 
-exports.createRefund = async (paymentIntentId, amount, reason = "requested_by_customer", currency = "inr") => {
+exports.createRefund = async (paymentIntentId, amount, reason = "requested_by_customer") => {
     const refund = await stripe.refunds.create({
         payment_intent: paymentIntentId,
-        currency,
         amount: Math.round(amount * 100),
         reason
     });
@@ -48,18 +47,3 @@ exports.createTransfer = async (amount, destination_id, transfer_group, currency
 
     return transfer;
 };
-
-exports.createPayment = async (amount, source_id, destination_id, currency = "inr") => {
-    const transfer = await stripe.transfers.create({
-        amount: Math.round(amount * 100),
-        currency,
-        destination: destination_id,
-        transfer_group: transfer_group,
-    });
-
-    if (transfer.status !== "succeeded") {
-        throw new Error(`Payout failed with status: ${transfer.status}`);
-    }
-
-    return transfer;
-}

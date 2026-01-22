@@ -6,7 +6,7 @@ const CartItem = require("../models/cart_item.model");
 const Product = require("../models/product.model");
 const Payout = require("../models/payout.model");
 const response = require("../helpers");
-const createPaymentIntent = require("../helpers/stripe.helper");
+const {createPaymentIntent} = require("../helpers/stripe.helper");
 
 const PLATFORM_FEE_PERCENT = 0.10;
 
@@ -32,10 +32,9 @@ exports.checkout = async (req, res) => {
         let total_amount = 0;
 
         for (const item of cart_items) {
-            total_amount += Number(item.product.price);
             const product = await Product.findOne({
                 where: { id: item.product_id, is_deleted: false },
-                attributes: { include: ["stock"] },
+                attributes: ["id", "product_name", "stock", "price"],
                 transaction,
                 lock: transaction.LOCK.UPDATE,
             });
@@ -44,25 +43,21 @@ exports.checkout = async (req, res) => {
                 throw new Error(`Product not found: ${item.product_id}`);
             }
 
-            const currentStock = Number(product.stock);
-            const quantity = Number(item.quantity);
-
-            if (currentStock < quantity) {
-                throw new Error(`Insufficient stock for ${product.product_name}. Only ${currentStock} left.`);
+            if (Number(product.stock) < Number(item.quantity)) {
+                throw new Error(`Insufficient stock for ${product.product_name}.`);
             }
 
             await product.update({
-                stock: currentStock - quantity
+                stock: Number(product.stock) - Number(item.quantity)
             }, { transaction });
 
-            total_amount += Number(item.product.price) * quantity;
+            total_amount += Number(item.product.price) * Number(item.quantity);
         }
 
         const payment_intent = await createPaymentIntent(total_amount, payment_method_id, "inr");
 
         const order = await Order.create({
             user_id,
-            total_amount,
             address
         }, { transaction });
 
@@ -73,25 +68,20 @@ exports.checkout = async (req, res) => {
         }, { transaction });
 
         for (const item of cart_items) {
-            const quantity = Number(item.quantity);
-            const Amount = Number(item.product.price) * quantity;
+            const Amount = Number(item.product.price) * Number(item.quantity);
 
             const order_item = await OrderItem.create({
                 order_id: order.id,
                 product_id: item.product_id,
-                quantity: quantity,
+                quantity: item.quantity,
                 price: Amount,
             }, { transaction });
-            const unitPrice = Number(item.product.price);
-            const seller_id = item.product.seller_id;
-            const item_total = unitPrice * quantity;
-            const seller_share = item_total * (1 - PLATFORM_FEE_PERCENT);
 
             await Payout.create({
-                amount: seller_share,
+                amount: Amount * (1 - PLATFORM_FEE_PERCENT),
                 payment_id: payment.id,
                 order_item_id: order_item.id,
-                seller_id: seller_id,
+                seller_id: item.product.seller_id,
                 status: "Pending"
             }, { transaction });
         }

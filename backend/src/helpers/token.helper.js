@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const AuthToken = require("../models/auth_token.model")
 
 exports.generateToken = async (entity_id, role) => {
+    //For single device at a time.
     // await AuthToken.update(
     //     { is_active: false },
     //     { where: { entity_id, entity_type: role } }
