@@ -14,7 +14,8 @@ const STATUS_FLOW = {
     "Shipped": "Out for Delivery",
     "Out for Delivery": "Delivered",
     "Delivered": null,
-    "Return Requested": "Return Request Approved"
+    "Return Requested": "Return Request Approved",
+    "Return Requested": "Return Request Not Approved"
 };
 
 exports.updateStatus = async (req, res) => {
@@ -53,6 +54,13 @@ exports.updateStatus = async (req, res) => {
             updateData.delivered_on = new Date();
             updateData.payout_eligible_at = new Date(
                 Date.now() + 10 * 24 * 60 * 60 * 1000
+            );
+        }
+
+        if (status === "Return Request Not Approved") {
+            await Payout.update(
+                { status: "Pending" },
+                { where: { order_item_id: id } }
             );
         }
 

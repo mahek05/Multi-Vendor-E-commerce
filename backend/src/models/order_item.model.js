@@ -29,7 +29,8 @@ const OrderItem = sequelize.define(
                 "Delivered",
                 "Refunded",
                 "Return Requested",
-                "Return Request Approved"
+                "Return Request Approved",
+                "Return Request Not Approved"
             ),
             defaultValue: "Order Placed",
         },

@@ -3,7 +3,7 @@ const Payout = require("../models/payout.model");
 const OrderItem = require("../models/order_item.model");
 const Product = require("../models/product.model");
 const Seller = require("../models/seller.model");
-const {createTransfer} = require("../helpers/stripe.helper");
+const { createTransfer } = require("../helpers/stripe.helper");
 
 exports.processPayouts = async () => {
     try {
@@ -44,7 +44,7 @@ exports.processPayouts = async () => {
             } catch (stripeError) {
                 console.error(`Stripe Error: ${stripeError.message}`);
             }
-        
+
             await payout.update({
                 status: "Paid",
             });
