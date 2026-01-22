@@ -15,7 +15,9 @@ exports.processPayouts = async () => {
                 {
                     model: OrderItem,
                     where: {
-                        status: "Delivered",
+                        status: {
+                            [Op.or]: ["Delivered", "Return Request Not Approved"]
+                        },
                         payout_eligible_at: {
                             [Op.lte]: new Date(),
                         },
