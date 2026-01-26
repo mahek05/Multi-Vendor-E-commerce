@@ -65,6 +65,14 @@ const MESSAGES = {
     '5020': 'Return application has been submitted.',
     '5021': 'Return Status updated.',
 
+    //Chat
+    '6001': 'User can\'t create group.',
+    '6002': 'Group created successfully.',
+    '6003': 'Groups included in.',
+    '6004': 'No valid participants found. Please check the emails.',
+    '6005': 'Private chat created.',
+    '6006': 'Access Denied: You are not a member of this chat room.',
+
     // Common
     '9000': 'Please enter valid data!',
     '9001': 'Not found.',

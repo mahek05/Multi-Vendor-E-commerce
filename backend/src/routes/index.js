@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const userRoutes = require("./user.route");
+const chatRoutes = require("./chat.route");
 const orderRoutes = require("./order.route");
 const adminRoutes = require("./admin.route");
 const sellerRoutes = require("./seller.route");
@@ -12,6 +13,7 @@ const emailOtpRoutes = require("./email_otp.route");
 const orderItemRoutes = require("./order_item.route");
 
 router.use("/user", userRoutes);
+router.use("/chat", chatRoutes);
 router.use("/order", orderRoutes);
 router.use("/admin", adminRoutes);
 router.use("/otp", emailOtpRoutes);

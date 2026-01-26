@@ -1,6 +1,6 @@
 const CartItem = require("../models/cart_item.model");
 const Product = require("../models/product.model");
-const response = require("../helpers")
+const response = require("../helpers");
 const {
     getPaginationMetadata,
     getPaginatedResponse
