@@ -9,7 +9,7 @@ const { checkoutSchema } = require("../validators/order.validator");
 router.post(
     "/checkout",
     verifyUser,
-    validate(checkoutSchema), 
+    validate(checkoutSchema),
     orderController.checkout
 );
 

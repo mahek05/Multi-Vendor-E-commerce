@@ -7,27 +7,9 @@ const {
     verifyAdmin
 } = require("../middlewares/auth.middleware")
 
-router.get(
-    "/seller/:room_id",
-    verifySeller,
-    chatController.getChat
-);
-
-router.get(
-    "/admin/:room_id",
-    verifyAdmin,
-    chatController.getChat
-);
-
-router.get(
-    "/user/:room_id",
-    verifyUser,
-    chatController.getChat
-);
-
 router.post(
-    "/seller/chat", 
-    verifySeller, 
+    "/seller/chat",
+    verifySeller,
     chatController.createPrivateChat
 );
 
@@ -56,15 +38,33 @@ router.get(
 );
 
 router.post(
-    "/admin/group", 
-    verifyAdmin, 
+    "/admin/group",
+    verifyAdmin,
     chatController.createGroup
 );
 
 router.post(
-    "/seller/group", 
-    verifySeller, 
+    "/seller/group",
+    verifySeller,
     chatController.createGroup
+);
+
+router.get(
+    "/seller/:room_id",
+    verifySeller,
+    chatController.getChat
+);
+
+router.get(
+    "/admin/:room_id",
+    verifyAdmin,
+    chatController.getChat
+);
+
+router.get(
+    "/user/:room_id",
+    verifyUser,
+    chatController.getChat
 );
 
 module.exports = router;

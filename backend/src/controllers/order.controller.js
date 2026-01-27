@@ -6,7 +6,7 @@ const CartItem = require("../models/cart_item.model");
 const Product = require("../models/product.model");
 const Payout = require("../models/payout.model");
 const response = require("../helpers");
-const {createPaymentIntent} = require("../helpers/stripe.helper");
+const { createPaymentIntent } = require("../helpers/stripe.helper");
 
 const PLATFORM_FEE_PERCENT = 0.10;
 

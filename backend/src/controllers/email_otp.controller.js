@@ -22,7 +22,7 @@ exports.send_otp = async (req, res) => {
         if (existingOtp) {
             return response.error(res, 1018, 429);
         }
-        
+
         const recentlyVerified = await EmailOtp.findOne({
             where: {
                 email,

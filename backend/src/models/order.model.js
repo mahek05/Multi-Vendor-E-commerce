@@ -17,7 +17,7 @@ const Order = sequelize.define(
                 key: "id",
             },
         },
-        
+
         address: {
             type: DataTypes.TEXT,
             allowNull: false,

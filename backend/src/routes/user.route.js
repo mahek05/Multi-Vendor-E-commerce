@@ -27,7 +27,7 @@ router.post(
     "/logout",
     verifyUser,
     userController.logout
-);  
+);
 
 router.get(
     "/profile",

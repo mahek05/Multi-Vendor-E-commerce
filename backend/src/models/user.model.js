@@ -32,7 +32,7 @@ const User = sequelize.define(
 
         phone_number: {
             type: DataTypes.STRING(15),
-            allowNull:false,
+            allowNull: false,
         },
     },
     {

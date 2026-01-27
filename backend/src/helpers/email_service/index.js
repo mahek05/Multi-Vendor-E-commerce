@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const {transporter} = require("../../config/email");
+const { transporter } = require("../../config/email");
 
 exports.send_otp_email = async (email, otp) => {
     try {

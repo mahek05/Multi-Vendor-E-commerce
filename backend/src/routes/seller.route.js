@@ -18,34 +18,34 @@ router.post(
 );
 
 router.post(
-    "/login", 
+    "/login",
     loginRateLimit,
     validate(sellerLoginSchema),
     sellerController.login
 );
 
 router.post(
-    "/logout", 
-    verifySeller, 
+    "/logout",
+    verifySeller,
     sellerController.logout
 );
 
 router.get(
-    "/profile", 
-    verifySeller, 
+    "/profile",
+    verifySeller,
     sellerController.getProfile
 );
 
 router.put(
-    "/profile", 
+    "/profile",
     verifySeller,
     validate(sellerUpdateSchema),
     sellerController.updateProfile
 );
 
 router.delete(
-    "/profile", 
-    verifySeller, 
+    "/profile",
+    verifySeller,
     sellerController.deactivateProfile
 );
 
