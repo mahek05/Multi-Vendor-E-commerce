@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 exports.createProductSchema = Joi.object({
-    product_name: Joi.string().max(10).required(),
+    product_name: Joi.string().max(30).required(),
     description: Joi.string().required(),
     price: Joi.number().required(),
     stock: Joi.number().required(),
@@ -9,7 +9,7 @@ exports.createProductSchema = Joi.object({
 });
 
 exports.updateProductSchema = Joi.object({
-    product_name: Joi.string().max(10).optional(),
+    product_name: Joi.string().max(30).optional(),
     description: Joi.string().optional(),
     price: Joi.number().optional(),
     stock: Joi.number().optional(),

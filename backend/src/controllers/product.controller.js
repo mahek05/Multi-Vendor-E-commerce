@@ -159,7 +159,7 @@ exports.getProductById = async (req, res) => {
 
 exports.getProductBySellerId = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { seller_id } = req.seller;
 
         const { page, limit, offset } = getPaginationMetadata(
             req.query.page,
@@ -168,7 +168,7 @@ exports.getProductBySellerId = async (req, res) => {
 
         const products = await Product.findAndCountAll({
             where: {
-                seller_id: id,
+                seller_id: seller_id,
                 is_deleted: false,
             },
             limit,
