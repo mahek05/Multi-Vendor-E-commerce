@@ -4,7 +4,7 @@ const validate = require("../middlewares/validate.middleware");
 const {
     userSignupSchema,
     userLoginSchema,
-    updateProfileSchema
+    userUpdateSchema
 } = require("../validators/user.validator");
 const userController = require("../controllers/user.controller");
 const { verifyUser } = require("../middlewares/auth.middleware");
@@ -38,7 +38,7 @@ router.get(
 router.put(
     "/profile",
     verifyUser,
-    validate(updateProfileSchema),
+    validate(userUpdateSchema),
     userController.updateProfile
 );
 
