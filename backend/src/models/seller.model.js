@@ -66,7 +66,7 @@ const Seller = sequelize.define(
 
         defaultScope: {
             attributes: {
-                exclude: ["approved_by"],
+                exclude: ["approved_by", "password"],
             },
         },
     }
