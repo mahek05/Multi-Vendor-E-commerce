@@ -100,7 +100,7 @@ module.exports = (io) => {
                     statuses[id] = socketsSet.size > 0;
                 });
 
-                socket.emit("onlineStatuses", statuses);
+                socket.emit("onlineStatus", statuses);
             } catch (err) {
                 console.error("Error fetching online statuses:", err);
                 socket.emit("error", "Failed to get online statuses");
