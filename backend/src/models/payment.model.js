@@ -35,8 +35,8 @@ const Payment = sequelize.define(
         },
 
         payment_status: {
-            type: DataTypes.ENUM("Paid", "Refunded", "Partially_Refunded"),
-            defaultValue: "Paid",
+            type: DataTypes.ENUM("Pending", "Paid", "Refunded", "Partially_Refunded"),
+            defaultValue: "Pending",
         },
 
         is_deleted: {

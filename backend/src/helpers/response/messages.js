@@ -23,6 +23,8 @@ const MESSAGES = {
     '1020': 'Seller account is not approved by admin.',
     '1021': "Seller status changed.",
     '1022': 'User already verified.',
+    '1023': 'Access Token updated.',
+    '1024': 'Access Token not updated.',
 
     //Category
     '2001': 'Category created successfully.',

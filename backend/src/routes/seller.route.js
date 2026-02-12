@@ -49,4 +49,10 @@ router.delete(
     sellerController.deactivateProfile
 );
 
+router.post(
+    "/onboard-stripe", 
+    verifySeller,
+    sellerController.onboardStripe
+);
+
 module.exports = router;

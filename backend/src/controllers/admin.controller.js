@@ -84,6 +84,7 @@ exports.login = async (req, res) => {
             entity_id: token.entity_id,
             access_token: token.access_token,
             refresh_token: token.refresh_token,
+            role: "ADMIN"
         }, 200);
     } catch (error) {
         console.error(error);
@@ -159,12 +160,14 @@ exports.deactivateProfile = async (req, res) => {
             return response.error(res, 1006, 404);
         }
 
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return response.error(res, 1008, 401);
+        }
+
         await admin.update({ is_deleted: true });
 
-        await AuthToken.update(
-            { is_active: false },
-            { where: { entity_id: admin_id, entity_type: "ADMIN" } }
-        );
+        await deactivateToken(token);
 
         return response.success(res, 1012, null, 200);
     } catch (error) {

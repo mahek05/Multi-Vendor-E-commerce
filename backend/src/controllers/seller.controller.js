@@ -1,5 +1,5 @@
 const Seller = require("../models/seller.model");
-const AuthToken = require("../models/auth_token.model");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -11,7 +11,7 @@ const {
 
 exports.signup = async (req, res) => {
     try {
-        const { name, email, password, address, phone_number, stripe_account_id } = req.body;
+        const { name, email, password, address, phone_number } = req.body;
 
         const otpRecord = await EmailOtp.findOne({
             where: {
@@ -42,8 +42,7 @@ exports.signup = async (req, res) => {
             email,
             password: hashedPassword,
             address,
-            phone_number,
-            stripe_account_id
+            phone_number
         });
 
         return response.success(res, 1001, null, 201);
@@ -80,7 +79,8 @@ exports.login = async (req, res) => {
         return response.success(res, 1002, {
             entity_id: token.entity_id,
             access_token: token.access_token,
-            refresh_token: token.refresh_token
+            refresh_token: token.refresh_token,
+            role: "SELLER"
         }, 200);
     } catch (error) {
         console.error(error);
@@ -127,7 +127,7 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const { seller_id } = req.seller;
-        const { name, address, phone_number, stripe_account_id } = req.body;
+        const { name, address, phone_number } = req.body;
 
         const seller = await Seller.findOne({ where: { id: seller_id } });
 
@@ -139,7 +139,6 @@ exports.updateProfile = async (req, res) => {
             name: name ?? seller.name,
             address: address ?? seller.address,
             phone_number: phone_number ?? seller.phone_number,
-            stripe_account_id: stripe_account_id ?? seller.stripe_account_id
         });
 
         return response.success(res, 1011, seller, 200);
@@ -152,6 +151,10 @@ exports.updateProfile = async (req, res) => {
 exports.deactivateProfile = async (req, res) => {
     try {
         const { seller_id } = req.seller;
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return response.error(res, 1008, 401);
+        }
 
         const seller = await Seller.findOne({ where: { id: seller_id } });
 
@@ -161,14 +164,51 @@ exports.deactivateProfile = async (req, res) => {
 
         await seller.update({ is_deleted: true });
 
-        await AuthToken.update(
-            { is_active: false },
-            { where: { entity_id: seller_id, entity_type: "SELLER" } }
-        );
+        await deactivateToken(token);
 
         return response.success(res, 1012, null, 200);
     } catch (error) {
         console.error("Deactivate seller error:", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.onboardStripe = async (req, res) => {
+    try {
+        const { seller_id } = req.seller;
+
+        const seller = await Seller.findOne({ where: { id: seller_id } });
+
+        if (!seller) {
+            return response.error(res, 1006, 404);
+        }
+
+        if (!seller.stripe_account_id) {
+            const account = await stripe.accounts.create({
+                type: 'express',
+                email: seller.email,
+                country: 'US',
+                capabilities: {
+                    card_payments: { requested: true },
+                    transfers: { requested: true },
+                },
+            });
+
+            seller.stripe_account_id = account.id;
+            await seller.save();
+        }
+
+        const accountLink = await stripe.accountLinks.create({
+            account: seller.stripe_account_id,
+            refresh_url: 'http://localhost:5173/seller/dashboard', 
+            return_url: 'http://localhost:5173/seller/dashboard',   
+            type: 'account_onboarding',
+        });
+
+        return response.success(res, 1013, { url: accountLink.url }, 200);
+
+    } catch (error) {
+        console.error("Stripe Onboarding Error:", error);
         return response.error(res, 9999);
     }
 };

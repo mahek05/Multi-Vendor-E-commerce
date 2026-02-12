@@ -8,17 +8,29 @@ const {
 
 exports.createCartItem = async (req, res) => {
     try {
-        const { quantity } = req.body;
+        const { quantity = 1 } = req.body;
         const { id } = req.params;
         const { user_id } = req.user;
 
-        await CartItem.create({
-            quantity,
-            user_id,
-            product_id: id
+        const existingItem = await CartItem.findOne({
+            where: { user_id, product_id: id }
         });
 
-        return response.success(res, 4001, null, 201);
+        if (existingItem) {
+            await existingItem.update({
+                quantity: existingItem.quantity + quantity
+            });
+
+            return response.success(res, 4003, existingItem, 200);
+        }
+
+        const newItem = await CartItem.create({
+            quantity,
+            user_id,
+            product_id : id
+        });
+
+        return response.success(res, 4001, newItem, 201);
     } catch (error) {
         console.error(error);
         return response.error(res, 9999);

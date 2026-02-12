@@ -10,12 +10,14 @@ const {
 } = require("../helpers/pagination.helper");
 
 const STATUS_FLOW = {
-    "Order Placed": "Shipped",
-    "Shipped": "Out for Delivery",
-    "Out for Delivery": "Delivered",
-    "Delivered": null,
-    "Return Requested": "Return Request Approved",
-    "Return Requested": "Return Request Not Approved"
+    "Order Placed": ["Shipped"],
+    "Shipped": ["Out for Delivery"],
+    "Out for Delivery": ["Delivered"],
+    "Delivered": [],
+    "Return Requested": [
+        "Return Request Approved",
+        "Return Request Not Approved"
+    ]
 };
 
 exports.updateStatus = async (req, res) => {
@@ -44,7 +46,9 @@ exports.updateStatus = async (req, res) => {
 
         const current_status = order_item.status;
 
-        if (status !== STATUS_FLOW[current_status]) {
+        const allowedStatuses = STATUS_FLOW[current_status] || [];
+
+        if (!allowedStatuses.includes(status)) {
             return response.error(res, 5008, 403);
         }
 
@@ -224,7 +228,7 @@ exports.sellerOrderHistory = async (req, res) => {
                 },
                 {
                     model: Payout,
-                    attributes: ['amount', 'status']
+                    attributes: ['id', 'amount', 'status']
                 }
             ]
         });

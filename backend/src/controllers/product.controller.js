@@ -1,11 +1,13 @@
 const Product = require("../models/product.model");
 const Category = require("../models/category.model");
+const Seller = require("../models/seller.model")
 const response = require("../helpers");
 const {
     getPaginationMetadata,
     getPaginatedResponse
 } = require("../helpers/pagination.helper");
 const { deleteFile } = require("../middlewares/upload.middleware");
+const { Op } = require("sequelize");
 
 exports.createProduct = async (req, res) => {
     try {
@@ -144,6 +146,13 @@ exports.getProductById = async (req, res) => {
                 id,
                 is_deleted: false,
             },
+            include: [
+                {
+                    model: Seller,
+                    as: "seller",
+                    attributes: ["id", "name", "email", "address", "phone_number"],
+                },
+            ],
         });
 
         if (!product) {
@@ -186,7 +195,20 @@ exports.getProductBySellerId = async (req, res) => {
 
 exports.getProductByCategory = async (req, res) => {
     try {
-        const { id } = req.params;
+        let { name } = req.params;
+        name = decodeURIComponent(name).toLowerCase().trim();
+
+        const category = await Category.findOne({
+            where: {
+                category_name: {
+                    [Op.like]: `%${name}%`,
+                },
+            },
+        });
+
+        if (!category) {
+            return response.error(res, 4004, 404);
+        }
 
         const { page, limit, offset } = getPaginationMetadata(
             req.query.page,
@@ -195,7 +217,57 @@ exports.getProductByCategory = async (req, res) => {
 
         const products = await Product.findAndCountAll({
             where: {
-                category_id: id,
+                category_id: category.id,
+                [Op.or]: [
+                    { is_deleted: false },
+                    { is_deleted: null }
+                ],
+            },
+            limit,
+            offset,
+            order: [["created_at", "DESC"]],
+        });
+
+        const paginatedResponse = getPaginatedResponse(
+            products,
+            page,
+            limit
+        );
+
+        return response.success(res, null, paginatedResponse, 200);
+    } catch (error) {
+        console.error("Error:", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getSellerProductByCategory = async (req, res) => {
+    try {
+        let { name } = req.params;
+        const { seller_id } = req.seller;
+        name = decodeURIComponent(name).toLowerCase().trim();
+
+        const category = await Category.findOne({
+            where: {
+                category_name: {
+                    [Op.like]: `%${name}%`,
+                },
+            },
+        });
+
+        if (!category) {
+            return response.error(res, 4004, 404);
+        }
+
+        const { page, limit, offset } = getPaginationMetadata(
+            req.query.page,
+            req.query.limit
+        );
+
+        const products = await Product.findAndCountAll({
+            where: {
+                category_id: category.id,
+                seller_id,
                 is_deleted: false,
             },
             limit,
@@ -211,7 +283,7 @@ exports.getProductByCategory = async (req, res) => {
 
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Error: ", error);
-        return response.error(res, 9999)
+        console.error("Error:", error);
+        return response.error(res, 9999);
     }
 };

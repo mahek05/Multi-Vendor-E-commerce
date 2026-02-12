@@ -55,7 +55,14 @@ router.get(
 );
 
 router.get(
-    "/getByCategory/:id",
+    "/getBySellerCategory/:name",
+    verifySeller,
+    verifySellerApproved,
+    productController.getSellerProductByCategory
+);
+
+router.get(
+    "/getByCategory/:name",
     productController.getProductByCategory
 );
 

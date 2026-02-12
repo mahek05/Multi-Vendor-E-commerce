@@ -1,6 +1,6 @@
-exports.getPaginationMetadata = (pageNo = 1, limitNo = 10) => {
+exports.getPaginationMetadata = (pageNo = 1, limitNo = 20) => {
     const page = parseInt(pageNo) || 1;
-    const limit = parseInt(limitNo) || 10;
+    const limit = parseInt(limitNo) || 20;
     const offset = (page - 1) * limit;
     return { page, limit, offset };
 };

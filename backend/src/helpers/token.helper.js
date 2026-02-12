@@ -36,8 +36,31 @@ exports.generateToken = async (entity_id, role) => {
 };
 
 exports.deactivateToken = async (token) => {
-    await AuthToken.update(
-        { is_active: false },
+    await AuthToken.destroy(
         { where: { access_token: token } }
     );
+};
+
+exports.regenerateAccessToken = async (refreshToken, entity_id, role) => {
+    const newAccessToken = jwt.sign(
+        { entity_id, role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+    );
+
+    const token = await AuthToken.update(
+        { access_token: newAccessToken, },
+        {
+            where: {
+                refresh_token: refreshToken,
+                entity_id: entity_id
+            }
+        }
+    );
+
+    return {
+        access_token: newAccessToken,
+        refresh_token: refreshToken,
+        role: role
+    };
 };

@@ -18,12 +18,12 @@ router.post(
 router.get(
     "/",
     verifyUser,
-    validate(updateCartItemSchema),
     cartItemController.getAllCartItem
 );
 router.put(
     "/:id",
-    verifyUser,
+    verifyUser,  
+    validate(updateCartItemSchema),
     cartItemController.updateCartItem
 );
 

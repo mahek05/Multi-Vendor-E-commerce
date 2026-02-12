@@ -34,7 +34,7 @@ exports.checkout = async (req, res) => {
         for (const item of cart_items) {
             const product = await Product.findOne({
                 where: { id: item.product_id, is_deleted: false },
-                attributes: ["id", "product_name", "stock", "price"],
+                attributes: ["id", "product_name", "stock", "price", "seller_id"],
                 transaction,
                 lock: transaction.LOCK.UPDATE,
             });
@@ -51,7 +51,7 @@ exports.checkout = async (req, res) => {
                 stock: Number(product.stock) - Number(item.quantity)
             }, { transaction });
 
-            total_amount += Number(item.product.price) * Number(item.quantity);
+            total_amount += Number(product.price) * Number(item.quantity);
         }
 
         const payment_intent = await createPaymentIntent(total_amount, payment_method_id, "inr");
@@ -65,6 +65,7 @@ exports.checkout = async (req, res) => {
             order_id: order.id,
             gateway_payment_id: payment_intent.id,
             amount: total_amount,
+            payment_status: "Paid"
         }, { transaction });
 
         for (const item of cart_items) {

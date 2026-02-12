@@ -56,7 +56,7 @@ const Seller = sequelize.define(
 
         stripe_account_id: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
     },
     {

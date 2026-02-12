@@ -79,7 +79,8 @@ exports.login = async (req, res) => {
         return response.success(res, 1002, {
             entity_id: token.entity_id,
             access_token: token.access_token,
-            refresh_token: token.refresh_token
+            refresh_token: token.refresh_token,
+            role: "USER"
         }, 200);
     } catch (error) {
         console.error(error);
@@ -150,6 +151,10 @@ exports.updateProfile = async (req, res) => {
 exports.deactivateProfile = async (req, res) => {
     try {
         const { user_id } = req.user;
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return response.error(res, 1008, 401);
+        }
 
         const user = await User.findOne({ where: { id: user_id } });
 
@@ -159,10 +164,7 @@ exports.deactivateProfile = async (req, res) => {
 
         await user.update({ is_deleted: true });
 
-        await AuthToken.update(
-            { is_active: false },
-            { where: { entity_id: user_id, entity_type: "USER" } }
-        );
+        await deactivateToken(token);
 
         return response.success(res, 1012, null, 200);
     } catch (error) {
