@@ -205,7 +205,7 @@ exports.onboardStripe = async (req, res) => {
             type: 'account_onboarding',
         });
 
-        return response.success(res, 1013, { url: accountLink.url }, 200);
+        return response.success(res, 1025, { url: accountLink.url }, 200);
 
     } catch (error) {
         console.error("Stripe Onboarding Error:", error);

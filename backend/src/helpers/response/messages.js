@@ -25,6 +25,7 @@ const MESSAGES = {
     '1022': 'User already verified.',
     '1023': 'Access Token updated.',
     '1024': 'Access Token not updated.',
+    '1025': 'Stripe account created.',
 
     //Category
     '2001': 'Category created successfully.',
