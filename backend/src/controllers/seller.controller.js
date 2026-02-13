@@ -110,7 +110,7 @@ exports.getProfile = async (req, res) => {
 
         const seller = await Seller.findOne({
             where: { id: seller_id },
-            attributes: ["name", "email", "address", "phone_number"],
+            attributes: ["name", "email", "address", "phone_number", "status"],
         });
 
         if (!seller) {
