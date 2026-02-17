@@ -44,6 +44,11 @@ const Payout = sequelize.define(
             defaultValue: "Pending",
         },
 
+        stripe_transfer_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+
         // is_deleted: {
         //     type: DataTypes.BOOLEAN,
         //     defaultValue: false,

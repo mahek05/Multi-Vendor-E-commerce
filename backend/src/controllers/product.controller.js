@@ -14,6 +14,16 @@ exports.createProduct = async (req, res) => {
         const { product_name, description, price, stock, category_id } = req.body;
         const seller_id = req.seller.seller_id;
 
+        const category = await Category.findAll({
+            where: {
+                id: category_id
+            }
+        });
+
+        if (!category) {
+            return response.error(res, 2002, 404);
+        }
+
         let imagePath = null;
 
         if (req.file) {
@@ -40,6 +50,7 @@ exports.updateProduct = async (req, res) => {
     try {
         const { product_name, description, price, stock, category_id } = req.body;
         const { id } = req.params;
+        const { seller_id } = req.seller;
 
         let newImagePath = null;
         if (req.file) {
@@ -49,7 +60,7 @@ exports.updateProduct = async (req, res) => {
         const product = await Product.findOne({
             where: {
                 id,
-                is_deleted: false,
+                seller_id
             },
         });
 
@@ -66,7 +77,7 @@ exports.updateProduct = async (req, res) => {
             product_name: product_name ?? product.product_name,
             description: description ?? product.description,
             price: price ?? product.price,
-            stock: stock ?? product.stock,
+            stock:  (product.stock + stock) ?? product.stock,
             image: newImagePath ?? product.image,
             category_id: category_id ?? product.category_id
         });
@@ -81,11 +92,12 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
+        const { seller_id } = req.seller;
 
         const product = await Product.findOne({
             where: {
                 id,
-                is_deleted: false,
+                seller_id
             },
         });
 
@@ -97,7 +109,7 @@ exports.deleteProduct = async (req, res) => {
             deleteFile(product.image);
         }
 
-        await product.update({ is_deleted: true });
+        await product.destroy();
 
         return response.success(res, 3004, null, 200);
     } catch (error) {
@@ -114,13 +126,9 @@ exports.getAllProducts = async (req, res) => {
         );
 
         const products = await Product.findAndCountAll({
-            where: { is_deleted: false },
+            attributes: ["id", "product_name", "stock", "price", "image"],
             limit,
             offset,
-            include: [{
-                model: Category,
-                attributes: ['category_name']
-            }],
             order: [["created_at", "DESC"]],
         });
 
@@ -143,9 +151,9 @@ exports.getProductById = async (req, res) => {
 
         const product = await Product.findOne({
             where: {
-                id,
-                is_deleted: false,
+                id
             },
+            attributes: ["id", "product_name", "description", "stock", "price", "image"],
             include: [
                 {
                     model: Seller,
@@ -177,9 +185,9 @@ exports.getProductBySellerId = async (req, res) => {
 
         const products = await Product.findAndCountAll({
             where: {
-                seller_id: seller_id,
-                is_deleted: false,
+                seller_id: seller_id
             },
+            attributes: ["id", "product_name", "stock", "price", "image"],
             limit,
             offset,
             order: [["created_at", "DESC"]],
@@ -198,17 +206,20 @@ exports.getProductByCategory = async (req, res) => {
         let { name } = req.params;
         name = decodeURIComponent(name).toLowerCase().trim();
 
-        const category = await Category.findOne({
+        const category = await Category.findAll({
             where: {
                 category_name: {
                     [Op.like]: `%${name}%`,
                 },
             },
+            attributes: ["id"]
         });
 
         if (!category) {
-            return response.error(res, 4004, 404);
+            return response.error(res, 2002, 404);
         }
+
+        const categoryIds = category.map(c => c.id);
 
         const { page, limit, offset } = getPaginationMetadata(
             req.query.page,
@@ -217,15 +228,13 @@ exports.getProductByCategory = async (req, res) => {
 
         const products = await Product.findAndCountAll({
             where: {
-                category_id: category.id,
-                [Op.or]: [
-                    { is_deleted: false },
-                    { is_deleted: null }
-                ],
+                category_id: { [Op.in]: categoryIds }
             },
+            attributes: ["id", "product_name", "stock", "price", "image"],
             limit,
             offset,
             order: [["created_at", "DESC"]],
+            distinct: true
         });
 
         const paginatedResponse = getPaginatedResponse(
@@ -247,17 +256,20 @@ exports.getSellerProductByCategory = async (req, res) => {
         const { seller_id } = req.seller;
         name = decodeURIComponent(name).toLowerCase().trim();
 
-        const category = await Category.findOne({
+        const category = await Category.findAll({
             where: {
                 category_name: {
                     [Op.like]: `%${name}%`,
                 },
             },
+            attributes: ["id"]
         });
 
         if (!category) {
-            return response.error(res, 4004, 404);
+            return response.error(res, 2002, 404);
         }
+
+        const categoryIds = category.map(c => c.id);
 
         const { page, limit, offset } = getPaginationMetadata(
             req.query.page,
@@ -266,10 +278,10 @@ exports.getSellerProductByCategory = async (req, res) => {
 
         const products = await Product.findAndCountAll({
             where: {
-                category_id: category.id,
-                seller_id,
-                is_deleted: false,
+                category_id: { [Op.in]: categoryIds },
+                seller_id
             },
+            attributes: ["id", "product_name", "stock", "price", "image"],
             limit,
             offset,
             order: [["created_at", "DESC"]],

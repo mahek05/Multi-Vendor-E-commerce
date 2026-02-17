@@ -1,29 +1,45 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-exports.createPaymentIntent = async (amount, payment_method, currency = "inr") => {
-    const payment_intent = await stripe.paymentIntents.create({
-        amount: Math.round(amount * 100),
-        currency,
-        payment_method: payment_method,
-        confirm: true,
-        automatic_payment_methods: {
-            enabled: true,
-            allow_redirects: "never"
+exports.getOrCreateCustomer = async (user) => {
+
+    if (user.stripe_customer_id)
+        return user.stripe_customer_id;
+
+    const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.name,
+        metadata: {
+            user_id: user.id
         }
     });
 
-    if (payment_intent.status !== "succeeded") {
-        throw new Error(`Payment failed with status: ${payment_intent.status}`);
-    }
+    await user.update({
+        stripe_customer_id: customer.id
+    });
 
+    return customer.id;
+}
+
+exports.createCheckoutIntent = async (amount, metadata = {}, currency, customer_id) => {
+    const payment_intent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100),
+        currency,
+        customer: customer_id,
+        automatic_payment_methods: {
+            enabled: true,
+            allow_redirects: "never"
+        },
+        metadata,
+    });
     return payment_intent;
 };
 
-exports.createRefund = async (paymentIntentId, amount, reason = "requested_by_customer") => {
+exports.createRefund = async (chargeId, amount) => {
     const refund = await stripe.refunds.create({
-        payment_intent: paymentIntentId,
-        amount: Math.round(amount * 100),
-        reason
+        charge: chargeId,
+        amount: Math.round(amount * 100)
+    }, {
+        idempotencyKey: `refund_${chargeId}`
     });
 
     if (refund.status !== "succeeded") {
@@ -39,6 +55,8 @@ exports.createTransfer = async (amount, destination_id, transfer_group, currency
         currency,
         destination: destination_id,
         transfer_group: transfer_group,
+    }, {
+        idempotencyKey: `payout_${transfer_group}_${destination_id}_${amount}`
     });
 
     if (transfer.status !== "succeeded") {
@@ -46,4 +64,29 @@ exports.createTransfer = async (amount, destination_id, transfer_group, currency
     }
 
     return transfer;
+};
+
+exports.createConnectedAccount = async (email, country = "US") => {
+    const account = await stripe.accounts.create({
+        type: "express",
+        email,
+        country,
+        capabilities: {
+            card_payments: { requested: true },
+            transfers: { requested: true },
+        },
+    });
+
+    return account.id;
+};
+
+exports.generateOnboardingLink = async (accountId, redirectUrl) => {
+    const accountLink = await stripe.accountLinks.create({
+        account: accountId,
+        refresh_url: redirectUrl,
+        return_url: redirectUrl,
+        type: "account_onboarding",
+    });
+
+    return accountLink.url;
 };

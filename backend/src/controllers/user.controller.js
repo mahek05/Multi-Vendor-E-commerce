@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const AuthToken = require("../models/auth_token.model");
+const { createConnectedAccount, generateOnboardingLink } = require("../helpers/stripe.helper");
 const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -25,9 +26,12 @@ exports.signup = async (req, res) => {
             return response.error(res, 1017, 403);
         }
 
-        const existingUser = await User.findOne({ where: { email } });
+        const existingUser = await User.findOne({
+            where: { email },
+            paranoid: false,
+        });
 
-        if (existingUser && existingUser.is_deleted) {
+        if (existingUser && existingUser.deleted_at !== null) {
             return response.error(res, 1009, 403);
         }
 
@@ -63,10 +67,6 @@ exports.login = async (req, res) => {
 
         if (!user) {
             return response.error(res, 1006, 404);
-        }
-
-        if (user.is_deleted) {
-            return response.error(res, 1009, 403);
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -110,7 +110,7 @@ exports.getProfile = async (req, res) => {
 
         const user = await User.findOne({
             where: { id: user_id },
-            attributes: ["name", "email", "address", "phone_number"],
+            attributes: ["id", "name", "email", "address", "phone_number"],
         });
 
         if (!user) {
@@ -162,13 +162,37 @@ exports.deactivateProfile = async (req, res) => {
             return response.error(res, 1006, 404);
         }
 
-        await user.update({ is_deleted: true });
+        await user.destroy();
 
         await deactivateToken(token);
 
         return response.success(res, 1012, null, 200);
     } catch (error) {
         console.error("Deactivate user error:", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.onboardStripe = async (req, res) => {
+    try {
+        const { user_id } = req.user;
+
+        const user = await User.findByPk(user_id);
+        if (!user) return response.error(res, 1006, 404);
+
+        if (!user.stripe_account_id) {
+            user.stripe_account_id = await createConnectedAccount(user.email);
+            await user.save();
+        }
+
+        const url = await generateOnboardingLink(
+            user.stripe_account_id,
+            'http://localhost:5173/seller/products'
+        );
+
+        return response.success(res, 1025, { url }, 200);
+    } catch (error) {
+        console.error("Stripe User Onboarding Error:", error);
         return response.error(res, 9999);
     }
 };

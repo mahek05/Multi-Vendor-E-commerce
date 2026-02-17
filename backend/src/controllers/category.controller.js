@@ -26,8 +26,7 @@ exports.updateCategory = async (req, res) => {
 
         const category = await Category.findOne({
             where: {
-                id,
-                is_deleted: false,
+                id
             },
         });
 
@@ -53,7 +52,6 @@ exports.deleteCategory = async (req, res) => {
         const category = await Category.findOne({
             where: {
                 id,
-                is_deleted: false,
             },
         });
 
@@ -61,7 +59,7 @@ exports.deleteCategory = async (req, res) => {
             return response.error(res, 2002, 404);
         }
 
-        await category.update({ is_deleted: true });
+        await category.destroy();
 
         return response.success(res, 2003, null, 200);
     } catch (error) {
@@ -78,7 +76,6 @@ exports.getAllCategory = async (req, res) => {
         );
 
         const categories = await Category.findAndCountAll({
-            where: { is_deleted: false },
             limit,
             offset,
             order: [["created_at", "DESC"]],

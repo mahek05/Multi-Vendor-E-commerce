@@ -23,11 +23,6 @@ const Order = sequelize.define(
             allowNull: false,
             defaultValue: "defaultValue"
         },
-
-        is_deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
     },
     {
         tableName: "orders",

@@ -52,15 +52,16 @@ const Product = sequelize.define(
             },
         },
 
-        is_deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
+        deleted_at: {
+            type: DataTypes.DATE
+        }
     },
     {
         tableName: "products",
         timestamps: true,
         underscored: true,
+        paranoid: true,
+        deletedAt: 'deleted_at',
     }
 );
 

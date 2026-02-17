@@ -1,5 +1,6 @@
 const Seller = require("../models/seller.model");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const { createConnectedAccount, generateOnboardingLink } = require("../helpers/stripe.helper");
 const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -25,9 +26,12 @@ exports.signup = async (req, res) => {
             return response.error(res, 1017, 403);
         }
 
-        const existingSeller = await Seller.findOne({ where: { email } });
+        const existingSeller = await Seller.findOne({
+            where: { email },
+            paranoid: false
+        });
 
-        if (existingSeller && existingSeller.is_deleted) {
+        if (existingSeller && existingSeller.deleted_at !== null) {
             return response.error(res, 1009, 403);
         }
 
@@ -63,10 +67,6 @@ exports.login = async (req, res) => {
 
         if (!seller) {
             return response.error(res, 1006, 404);
-        }
-
-        if (seller.is_deleted) {
-            return response.error(res, 1009, 403);
         }
 
         const isMatch = await bcrypt.compare(password, seller.password);
@@ -110,7 +110,7 @@ exports.getProfile = async (req, res) => {
 
         const seller = await Seller.findOne({
             where: { id: seller_id },
-            attributes: ["name", "email", "address", "phone_number", "status"],
+            attributes: ["id", "name", "email", "address", "phone_number", "status"],
         });
 
         if (!seller) {
@@ -162,7 +162,7 @@ exports.deactivateProfile = async (req, res) => {
             return response.error(res, 1006, 404);
         }
 
-        await seller.update({ is_deleted: true });
+        await seller.destroy();
 
         await deactivateToken(token);
 
@@ -200,13 +200,39 @@ exports.onboardStripe = async (req, res) => {
 
         const accountLink = await stripe.accountLinks.create({
             account: seller.stripe_account_id,
-            refresh_url: 'http://localhost:5173/seller/dashboard', 
-            return_url: 'http://localhost:5173/seller/dashboard',   
+            refresh_url: 'http://localhost:5173/seller/dashboard',
+            return_url: 'http://localhost:5173/seller/dashboard',
             type: 'account_onboarding',
         });
 
         return response.success(res, 1025, { url: accountLink.url }, 200);
 
+    } catch (error) {
+        console.error("Stripe Onboarding Error:", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.onboardStripe = async (req, res) => {
+    try {
+        const { seller_id } = req.seller;
+
+        const seller = await Seller.findOne({ where: { id: seller_id } });
+        if (!seller) {
+            return response.error(res, 1006, 404);
+        }
+
+        if (!seller.stripe_account_id) {
+            seller.stripe_account_id = await createConnectedAccount(seller.email);
+            await seller.save();
+        }
+
+        const url = await generateOnboardingLink(
+            seller.stripe_account_id,
+            'http://localhost:5173/seller/product'
+        );
+
+        return response.success(res, 1025, { url }, 200);
     } catch (error) {
         console.error("Stripe Onboarding Error:", error);
         return response.error(res, 9999);

@@ -27,7 +27,7 @@ exports.createCartItem = async (req, res) => {
         const newItem = await CartItem.create({
             quantity,
             user_id,
-            product_id : id
+            product_id: id
         });
 
         return response.success(res, 4001, newItem, 201);
@@ -43,9 +43,7 @@ exports.updateCartItem = async (req, res) => {
         const { id } = req.params;
 
         const cartItem = await CartItem.findOne({
-            where: {
-                id
-            },
+            where: { id },
         });
 
         if (!cartItem) {

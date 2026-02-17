@@ -45,6 +45,11 @@ const OrderItem = sequelize.define(
             allowNull: true,
         },
 
+        refund_processing: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+        },
+
         delivered_on: {
             type: DataTypes.DATE,
             allowNull: true,

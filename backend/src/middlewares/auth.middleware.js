@@ -112,8 +112,7 @@ exports.verifySellerApproved = async (req, res, next) => {
         const seller = await Seller.findOne({
             where: {
                 id: seller_id,
-                status: "Approved",
-                is_deleted: false,
+                status: "Approved"
             },
         });
 

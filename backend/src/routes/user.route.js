@@ -48,4 +48,10 @@ router.delete(
     userController.deactivateProfile
 );
 
+router.post(
+    "/onboard-stripe", 
+    verifyUser,
+    userController.onboardStripe
+);
+
 module.exports = router;

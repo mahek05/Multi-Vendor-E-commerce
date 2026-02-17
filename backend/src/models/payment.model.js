@@ -32,6 +32,7 @@ const Payment = sequelize.define(
         refunded_amount: {
             type: DataTypes.DECIMAL(10, 2),
             defaultValue: 0.00,
+            allowNull: false
         },
 
         payment_status: {
@@ -39,10 +40,14 @@ const Payment = sequelize.define(
             defaultValue: "Pending",
         },
 
-        is_deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
+        transfer_group: {
+            type: DataTypes.STRING,
+            allowNull: true
         },
+
+        stripe_charge_id: {
+            type: DataTypes.STRING
+        }
     },
     {
         tableName: "payments",

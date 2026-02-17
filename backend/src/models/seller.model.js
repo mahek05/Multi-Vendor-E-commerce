@@ -48,21 +48,22 @@ const Seller = sequelize.define(
                 key: "id",
             },
         },
-
-        is_deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
-
+        
         stripe_account_id: {
             type: DataTypes.STRING,
             allowNull: true
         },
+
+        deleted_at: {
+            type: DataTypes.DATE
+        }
     },
     {
         tableName: "sellers",
         timestamps: true,
         underscored: true,
+        paranoid: true,
+        deletedAt: 'deleted_at',
 
         defaultScope: {
             attributes: {

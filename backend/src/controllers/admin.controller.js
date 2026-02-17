@@ -31,9 +31,12 @@ exports.signup = async (req, res) => {
             return response.error(res, 1017, 403);
         }
 
-        const existingAdmin = await Admin.findOne({ where: { email } });
+        const existingAdmin = await Admin.findOne({
+            where: { email },
+            paranoid: false
+        });
 
-        if (existingAdmin && existingAdmin.is_deleted) {
+        if (existingAdmin && existingAdmin.deleted_at !== null) {
             return response.error(res, 1009, 403);
         }
 
@@ -67,10 +70,6 @@ exports.login = async (req, res) => {
 
         if (!admin) {
             return response.error(res, 1006, 404);
-        }
-
-        if (admin.is_deleted) {
-            return response.error(res, 1009, 403);
         }
 
         const isMatch = await bcrypt.compare(password, admin.password);
@@ -114,7 +113,7 @@ exports.getProfile = async (req, res) => {
 
         const admin = await Admin.findOne({
             where: { id: admin_id },
-            attributes: ["name", "email"],
+            attributes: ["id", "name", "email"],
         });
 
         if (!admin) {
@@ -165,9 +164,8 @@ exports.deactivateProfile = async (req, res) => {
             return response.error(res, 1008, 401);
         }
 
-        await admin.update({ is_deleted: true });
-
         await deactivateToken(token);
+        await admin.destroy();
 
         return response.success(res, 1012, null, 200);
     } catch (error) {
@@ -185,13 +183,15 @@ exports.sellerStatus = async (req, res) => {
         const seller = await Seller.findOne({
             where: {
                 id: id,
-                is_deleted: false,
             },
         });
 
         if (!seller) {
             return response.error(res, 1006, 404);
         }
+
+        if (seller.status === "APPROVED")
+            return response.error(res, 1022, 400);
 
         await seller.update({
             status: status,
@@ -213,7 +213,15 @@ exports.getSeller = async (req, res) => {
         );
 
         const sellers = await Seller.findAndCountAll({
-            where: { is_deleted: false },
+            attributes: ["name", "email", "phone_number", "address", "status", "deleted_at"],
+            paranoid: false,
+            include: [
+                {
+                    model: Admin,
+                    as: "admin",
+                    attributes: ["name", "id"],
+                },
+            ],
             limit,
             offset,
             order: [["created_at", "DESC"]],
@@ -240,6 +248,8 @@ exports.getUser = async (req, res) => {
         );
 
         const user = await User.findAndCountAll({
+            attributes: ["name", "email", "phone_number", "address", "deleted_at"],
+            paranoid: false,
             limit,
             offset,
             order: [["created_at", "DESC"]],

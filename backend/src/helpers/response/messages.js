@@ -26,6 +26,7 @@ const MESSAGES = {
     '1023': 'Access Token updated.',
     '1024': 'Access Token not updated.',
     '1025': 'Stripe account created.',
+    '1026': 'Seller already approved.',
 
     //Category
     '2001': 'Category created successfully.',
@@ -67,6 +68,7 @@ const MESSAGES = {
     '5019': 'Can\'t return.',
     '5020': 'Return application has been submitted.',
     '5021': 'Return Status updated.',
+    '5022': 'Insufficient stock.',
 
     //Chat
     '6001': 'User can\'t create group.',

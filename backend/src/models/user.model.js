@@ -35,16 +35,26 @@ const User = sequelize.define(
             allowNull: false,
         },
 
-        is_deleted: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
+        stripe_account_id: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+
+        stripe_customer_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+
+        deleted_at: {
+            type: DataTypes.DATE
         }
     },
     {
         tableName: "users",
         timestamps: true,
         underscored: true,
+        paranoid: true,
+        deletedAt: 'deleted_at',
 
         defaultScope: {
             attributes: {

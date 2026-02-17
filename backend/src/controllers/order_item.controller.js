@@ -86,6 +86,7 @@ exports.cancelOrderItem = async (req, res) => {
 
         const orderItem = await OrderItem.findOne({
             where: { id: order_item_id },
+            attributes: ["id", "status", "order_id", "product_id", "quantity"],
             transaction: t,
             lock: t.LOCK.UPDATE,
         });
@@ -122,6 +123,8 @@ exports.cancelOrderItem = async (req, res) => {
             return response.error(res, 9001, 404);
         }
 
+        await product.increment('stock', { by: orderItem.quantity, transaction: t });
+
         await orderItem.update(
             { status: "Order Cancelled" },
             { transaction: t }
@@ -152,6 +155,7 @@ exports.requestReturn = async (req, res) => {
 
         const orderItem = await OrderItem.findOne({
             where: { id: order_item_id },
+            attributes: ["status", "return_reason"],
             include: [{
                 model: Order,
                 required: true
@@ -190,7 +194,7 @@ exports.requestReturn = async (req, res) => {
 
         await Payout.update(
             { status: "Order Returned" },
-            { where: { order_item_id }, transaction: t }
+            { where: { order_item_id, seller_id: orderItem.product.seller_id }, transaction: t }
         );
 
         await t.commit();
@@ -213,6 +217,7 @@ exports.sellerOrderHistory = async (req, res) => {
         );
 
         const orderItem = await OrderItem.findAndCountAll({
+            attributes: ['product_id', 'status', 'price', "quantity", "order_id", "return_reason", "returned_on"],
             limit,
             offset,
             order: [['created_at', 'DESC']],

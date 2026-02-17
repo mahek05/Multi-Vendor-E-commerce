@@ -5,98 +5,151 @@ const Payment = require("../models/payment.model");
 const CartItem = require("../models/cart_item.model");
 const Product = require("../models/product.model");
 const Payout = require("../models/payout.model");
+const Seller = require("../models/seller.model");
 const response = require("../helpers");
-const { createPaymentIntent } = require("../helpers/stripe.helper");
-
-const PLATFORM_FEE_PERCENT = 0.10;
+const User = require("../models/user.model");
+const { getOrCreateCustomer, createCheckoutIntent } = require("../helpers/stripe.helper");
 
 exports.checkout = async (req, res) => {
-    const transaction = await sequelize.transaction();
     try {
         const { user_id } = req.user;
-        const { payment_method_id, address } = req.body;
 
         const cart_items = await CartItem.findAll({
             where: { user_id },
             include: [{
-                model: Product
+                model: Product,
+                attributes: ["id", "price", "stock"]
             }],
-            transaction
         });
 
         if (!cart_items || cart_items.length === 0) {
-            await transaction.rollback();
             return response.error(res, 5001, 400);
         }
 
+        const user = await User.findOne({ where: { id: user_id } });
+        if (!user) return response.error(res, 1006, 404);
+
+        const customer_id = await getOrCreateCustomer(user);
+
         let total_amount = 0;
 
-        for (const item of cart_items) {
-            const product = await Product.findOne({
-                where: { id: item.product_id, is_deleted: false },
-                attributes: ["id", "product_name", "stock", "price", "seller_id"],
-                transaction,
-                lock: transaction.LOCK.UPDATE,
-            });
-
-            if (!product) {
-                throw new Error(`Product not found: ${item.product_id}`);
+        for (const items of cart_items) {
+            if (!items.product) {
+                return response.error(res, 3002, 404);
+            }
+            if (items.product.stock < items.quantity) {
+                return response.error(res, 5022, 400)
             }
 
-            if (Number(product.stock) < Number(item.quantity)) {
-                throw new Error(`Insufficient stock for ${product.product_name}.`);
-            }
-
-            await product.update({
-                stock: Number(product.stock) - Number(item.quantity)
-            }, { transaction });
-
-            total_amount += Number(product.price) * Number(item.quantity);
+            total_amount += Number(items.product.price) * items.quantity;
         }
 
-        const payment_intent = await createPaymentIntent(total_amount, payment_method_id, "inr");
+        const paymentIntent = await createCheckoutIntent(total_amount, { user_id }, "inr", customer_id);
 
-        const order = await Order.create({
-            user_id,
-            address
-        }, { transaction });
-
-        const payment = await Payment.create({
-            order_id: order.id,
-            gateway_payment_id: payment_intent.id,
-            amount: total_amount,
-            payment_status: "Paid"
-        }, { transaction });
-
-        for (const item of cart_items) {
-            const Amount = Number(item.product.price) * Number(item.quantity);
-
-            const order_item = await OrderItem.create({
-                order_id: order.id,
-                product_id: item.product_id,
-                quantity: item.quantity,
-                price: Amount,
-            }, { transaction });
-
-            await Payout.create({
-                amount: Amount * (1 - PLATFORM_FEE_PERCENT),
-                payment_id: payment.id,
-                order_item_id: order_item.id,
-                seller_id: item.product.seller_id,
-                status: "Pending"
-            }, { transaction });
-        }
-
-        await CartItem.destroy({ where: { user_id }, transaction });
-
-        await transaction.commit();
-        return response.success(res, 5003, { order_id: order.id }, 201);
+        return response.success(res, null, {
+            client_secret: paymentIntent.client_secret
+        });
     } catch (error) {
-        await transaction.rollback();
         console.error("Checkout error:", error);
         return response.error(res, 9999);
     }
-};
+}
+
+
+// exports.checkout = async (req, res) => {
+//     
+
+//         let total_amount = 0;
+
+//         for (const item of cart_items) {
+//             const product = await Product.findOne({
+//                 where: { id: item.product_id },
+//                 attributes: ["id", "product_name", "stock", "price", "seller_id"],
+//                 transaction,
+//                 lock: transaction.LOCK.UPDATE,
+//             });
+
+//             const seller = await Seller.findByPk(product.seller_id, {
+//                 attributes: ["stripe_account_id"],
+//                 transaction
+//             });
+
+//             if (!product) {
+//                 throw new Error(`Product not found: ${item.product_id}`);
+//             }
+
+//             if (!seller?.stripe_account_id) {
+//                 throw new Error(`Seller not ready to receive payments`);
+//             }
+
+//             if (Number(product.stock) < Number(item.quantity)) {
+//                 throw new Error(`Insufficient stock for ${product.product_name}.`);
+//             }
+
+//             await product.update({
+//                 stock: Number(product.stock) - Number(item.quantity)
+//             }, { transaction });
+
+//             total_amount += Number(product.price) * Number(item.quantity);
+//         }
+
+//         const transfer_group = `ORDER_${Date.now()}_${user_id}`;
+//         const payment_intent = await createPaymentIntent(total_amount, transfer_group, "inr");
+
+//         const order = await Order.create({
+//             user_id,
+//             address
+//         }, { transaction });
+
+//         const payment = await Payment.create({
+//             order_id: order.id,
+//             gateway_payment_id: payment_intent.id,
+//             transfer_group,
+//             amount: total_amount,
+//             payment_status: "Paid"
+//         }, { transaction });
+
+//         return res.json({
+//             success: true,
+//             client_secret: payment_intent.client_secret
+//         });
+
+//         for (const item of cart_items) {
+//             const product = await Product.findOne({
+//                 where: { id: item.product_id },
+//                 attributes: ["id", "product_name", "stock", "price", "seller_id"],
+//                 transaction,
+//                 lock: transaction.LOCK.UPDATE,
+//             });
+
+//             const Amount = Number(product.price) * Number(item.quantity);
+
+//             const order_item = await OrderItem.create({
+//                 order_id: order.id,
+//                 product_id: item.product_id,
+//                 quantity: item.quantity,
+//                 price: Amount,
+//             }, { transaction });
+
+//             await Payout.create({
+//                 amount: Amount * (1 - PLATFORM_FEE_PERCENT),
+//                 payment_id: payment.id,
+//                 order_item_id: order_item.id,
+//                 seller_id: product.seller_id,
+//                 status: "Pending"
+//             }, { transaction });
+//         }
+
+//         await CartItem.destroy({ where: { user_id }, transaction });
+
+//         await transaction.commit();
+//         return response.success(res, 5003, { order_id: order.id }, 201);
+//     } catch (error) {
+//         await transaction.rollback();
+//         console.error("Checkout error:", error);
+//         return response.error(res, 9999);
+//     }
+// };
 
 exports.orderHistory = async (req, res) => {
     try {

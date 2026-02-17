@@ -45,6 +45,9 @@ Product.belongsTo(Category, { foreignKey: "category_id" });
 OrderItem.hasOne(Payout, { foreignKey: "order_item_id" });
 Payout.belongsTo(OrderItem, { foreignKey: "order_item_id" });
 
+Payout.belongsTo(Payment, { foreignKey: "payment_id" });
+Payment.hasMany(Payout, { foreignKey: "payment_id" });
+
 ChatRoom.hasMany(Chat, { foreignKey: "room_id", onDelete: "CASCADE" });
 Chat.belongsTo(ChatRoom, { foreignKey: "room_id" });
 
@@ -59,6 +62,9 @@ RoomParticipant.belongsTo(Seller, { foreignKey: "user_id", constraints: false })
 
 Admin.hasMany(RoomParticipant, { foreignKey: "user_id", constraints: false });
 RoomParticipant.belongsTo(Admin, { foreignKey: "user_id", constraints: false });
+
+Admin.hasMany(Seller, { foreignKey: "approved_by"});
+Seller.belongsTo(Admin, { foreignKey: "approved_by"});
 
 const db = {
     sequelize,

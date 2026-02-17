@@ -26,15 +26,16 @@ const Admin = sequelize.define(
             allowNull: false,
         },
 
-        is_deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
+        deleted_at: {
+            type: DataTypes.DATE
+        }
     },
     {
         tableName: "admins",
         timestamps: true,
         underscored: true,
+        paranoid: true,
+        deletedAt: 'deleted_at',
 
         defaultScope: {
             attributes: {
