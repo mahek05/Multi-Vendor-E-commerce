@@ -58,7 +58,6 @@ const SellerProfileUpdate = () => {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form className="space-y-6" onSubmit={handleSubmit}>
-
                     <Input
                         label="Name"
                         name="name"
@@ -82,7 +81,6 @@ const SellerProfileUpdate = () => {
                     />
 
                     <Button text="Update" type="submit" />
-
                 </form>
             </div>
         </div>

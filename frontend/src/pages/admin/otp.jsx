@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../components/Button';
 import { api } from '../../api/api'
 
-const SellerOtp = () => {
+const AdminOtp = () => {
     const navigate = useNavigate();
     const { state } = useLocation();
     const email = state?.email;
@@ -13,7 +13,7 @@ const SellerOtp = () => {
     const inputsRef = useRef([]);
 
     if (!email) {
-        navigate("/seller/signup");
+        navigate("/admin/signup");
     }
 
     const handleChange = (index, value) => {
@@ -50,10 +50,10 @@ const SellerOtp = () => {
             return alert("Invalid or expired OTP");
         }
 
-        const signupRes = await api("/seller/signup", "POST", state);
+        const signupRes = await api("/admin/signup", "POST", state);
 
         if (signupRes.success) {
-            navigate("/seller/login");
+            navigate("/admin/login");
         } else {
             alert("Signup failed");
         }
@@ -92,6 +92,13 @@ const SellerOtp = () => {
 
                 <p className="mt-10 text-center text-sm text-gray-500">
                     Didn't receive code?{' '}
+                    {/* <span
+                        className="cursor-pointer text-indigo-400 hover:underline"
+                        onClick={() => api("/otp/send_otp", "POST", { email })}
+                    >
+                        Resend
+                    </span> */}
+
                     <Link onClick={() => api("/otp/send_otp", "POST", { email })} className="font-semibold leading-6 text-slate-600 hover:text-indigo-600">
                         Resend
                     </Link>
@@ -101,4 +108,4 @@ const SellerOtp = () => {
     );
 };
 
-export default SellerOtp;
+export default AdminOtp;

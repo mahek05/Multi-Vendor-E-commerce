@@ -24,10 +24,8 @@ const SellerProducts = () => {
 
     return (
         <div className="flex min-h-screen flex-col px-6 py-6 lg:px-8 bg-slate-50">
-
             <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">Products</h2>
             <ProductGrid products={products} />
-
             <Pagination
                 pageInfo={pageInfo}
                 onPageChange={(newPage) => setPage(newPage)}

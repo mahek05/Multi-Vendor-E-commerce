@@ -53,7 +53,6 @@ const OrderHistory = () => {
                                 key={order.id}
                                 className="bg-white border border-slate-200 rounded-lg p-4"
                             >
-                                {/* Order meta */}
                                 <div className="flex flex-wrap justify-between gap-4 mb-4">
                                     <div>
                                         <p className="text-sm text-slate-500">
@@ -74,7 +73,6 @@ const OrderHistory = () => {
                                     </div>
                                 </div>
 
-                                {/* Order items */}
                                 <div className="divide-y divide-slate-200">
                                     {order.order_items.map((item) => (
                                         <div
@@ -101,7 +99,6 @@ const OrderHistory = () => {
                                                 </p>
                                             </div>
 
-                                            {/* Status */}
                                             <span
                                                 className={`text-xs font-medium px-2 py-1 rounded-full
                                                     ${item.status === "Delivered"

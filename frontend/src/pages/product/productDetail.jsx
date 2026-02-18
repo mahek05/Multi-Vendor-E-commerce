@@ -31,7 +31,7 @@ const ProductDetails = () => {
     };
 
     const handleUpdateProduct = async () => {
-        navigate("/product/update");
+        navigate(`/seller/product/update/${product.id}`);
     };
 
     const handleDeleteProduct = async () => {
@@ -60,7 +60,6 @@ const ProductDetails = () => {
                         </div>
                     </div>
 
-
                     <div className="mt-8 lg:col-span-4 lg:mt-0 lg:border-r lg:border-gray-200 lg:pr-8">
                         <h1 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
                             {product.product_name}
@@ -74,7 +73,6 @@ const ProductDetails = () => {
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN: The "Buy Box" (Span 3 cols) */}
                     <div className="mt-8 lg:col-span-3 lg:mt-0">
                         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                             <h2 className="sr-only">Product information</h2>

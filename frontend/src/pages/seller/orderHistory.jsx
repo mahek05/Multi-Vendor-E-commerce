@@ -76,32 +76,6 @@ const SellerOrders = () => {
                             })
                             : "—";
                         return (
-                            // <div
-                            //     key={item.id}
-                            //     className="bg-white border border-slate-200 rounded-lg p-4 flex justify-between items-center"
-                            // >
-                            //     <div>
-                            //         <p className="font-medium text-slate-900">
-                            //             {item.product.product_name}
-                            //         </p>
-                            //         <p className="text-sm text-slate-500">
-                            //             Qty: {item.quantity}
-                            //         </p>
-                            //         <p className="text-sm text-slate-500">
-                            //             Status: {item.status}
-                            //         </p>
-                            //     </div>
-
-                            //     {STATUS_FLOW[item.status] && (
-                            //         <button
-                            //             onClick={() => updateStatus(item)}
-                            //             className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                            //         >
-                            //             Mark as {STATUS_FLOW[item.status]}
-                            //         </button>
-                            //     )}
-                            // </div>
-
                             <div
                                 key={order.id}
                                 className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition"
@@ -163,86 +137,6 @@ const SellerOrders = () => {
                                             </p>
                                         </div>
                                     </div>
-
-                                    {/* <div className="text-right space-y-2">
-                                        <div>
-                                            <p className="text-xs text-slate-500">
-                                                Order Status
-                                            </p>
-
-                                            <span
-                                                className={`text-xs font-medium px-2 py-1 rounded-full
-                                                    ${order.status === "Delivered"
-                                                        ? "bg-green-100 text-green-700"
-                                                        : order.status.includes("Cancelled")
-                                                            ? "bg-red-100 text-red-700"
-                                                            : "bg-indigo-100 text-indigo-700"
-                                                    }`}
-                                            >{order.status}
-                                            </span>
-                                        </div>
-
-                                        <div>
-                                            <p className="text-xs text-slate-500">
-                                                Payout Status
-                                            </p>
-                                            <span
-                                                className={`text-xs font-medium px-2 py-1 rounded-full
-                                                    ${order.payout.status === "Paid"
-                                                        ? "bg-green-100 text-green-700"
-                                                        : order.payout.status.includes("Order Cancelled")
-                                                            ? "bg-red-100 text-red-700"
-                                                            : "bg-indigo-100 text-indigo-700"
-                                                    }`}
-                                            >
-                                                {order.payout.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    
-                                    <button
-                                        onClick={() => setOpenId(openId === order.id ? null : order.id)}
-                                        className="mt-4 px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-                                        aria-label="Status menu"
-                                    >
-                                        Update Status
-                                    </button>
-
-                                    {openId === order.id && (
-                                        <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-50">
-                                            {[
-                                                "Shipped",
-                                                "Out for Delivery",
-                                                "Delivered",
-                                                "Return Request Approved",
-                                                "Return Request Not Approved"
-                                            ].map((statusOption) => {
-                                                const allowedStatuses =
-                                                    STATUS_FLOW[order.status] || [];
-
-                                                const isAllowed =
-                                                    allowedStatuses.includes(statusOption);
-
-                                                return (
-                                                    <button
-                                                        key={statusOption}
-                                                        disabled={!isAllowed}
-                                                        onClick={() =>
-                                                            isAllowed &&
-                                                            updateStatus(order, statusOption)
-                                                        }
-                                                        className={`block w-full text-left px-4 py-2 text-sm
-                                                        ${isAllowed
-                                                                ? "hover:bg-slate-100"
-                                                                : "text-gray-400 cursor-not-allowed"
-                                                            }`}
-                                                    >
-                                                        {statusOption}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    )} */}
 
                                     <div className="flex justify-between items-start mt-4 border-t border-slate-100 pt-4">
 
@@ -321,20 +215,19 @@ const SellerOrders = () => {
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         );
                     })}
                 </div>
             </div>
+
             <Pagination
                 pageInfo={pageInfo}
                 onPageChange={(newPage) => setPage(newPage)}
             />
+
         </section>
-
-
     );
 };
 

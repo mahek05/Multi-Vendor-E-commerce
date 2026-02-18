@@ -50,7 +50,6 @@ const Login = () => {
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form className="space-y-6" onSubmit={handleSubmit}>
-
                     <Input
                         label="Email address"
                         name="email"
@@ -78,7 +77,6 @@ const Login = () => {
                     </div> */}
 
                     <Button text="Sign in" type="submit" />
-
                 </form>
 
                 <p className="mt-10 text-center text-sm text-gray-500">

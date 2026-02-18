@@ -4,14 +4,12 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { api } from '../../api/api';
 
-const SellerSignup = () => {
+const AdminSignup = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        password: '',
-        phone_number: '',
-        address: ''
+        password: ''
     });
 
     const handleChange = (e) => {
@@ -26,7 +24,7 @@ const SellerSignup = () => {
         });
 
         if (res.success) {
-            navigate("/seller/otp", { state: formData });
+            navigate("/admin/otp", { state: formData });
         } else {
             alert("OTP already sent.");
         }
@@ -42,6 +40,7 @@ const SellerSignup = () => {
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form className="space-y-6" onSubmit={handleSubmit}>
+
                     <Input
                         label="Email address"
                         name="email"
@@ -60,31 +59,6 @@ const SellerSignup = () => {
                     />
 
                     <Input
-                        label="Mobile Number"
-                        name="phone_number"
-                        type="tel"
-                        value={formData.phone_number}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <Input
-                        label="Address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <Input
-                        label="Stripe Payment id"
-                        name="stripe_account_id"
-                        value={formData.stripe_account_id}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <Input
                         label="Password"
                         name="password"
                         type="password"
@@ -92,13 +66,13 @@ const SellerSignup = () => {
                         onChange={handleChange}
                         required
                     />
-
                     <Button text="Sign in" type="submit" />
+
                 </form>
 
                 <p className="mt-10 text-center text-sm text-gray-500">
                     Already Registered?{' '}
-                    <Link to="/seller/login" className="font-semibold leading-6 text-slate-600 hover:text-indigo-600">
+                    <Link to="/admin/login" className="font-semibold leading-6 text-slate-600 hover:text-indigo-600">
                         Sign In
                     </Link>
                 </p>
@@ -107,4 +81,4 @@ const SellerSignup = () => {
     );
 };
 
-export default SellerSignup;
+export default AdminSignup;

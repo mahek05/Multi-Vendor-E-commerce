@@ -14,8 +14,6 @@ const Pagination = ({ pageInfo, onPageChange }) => {
             className="mt-10 flex justify-center"
         >
             <ul className="flex -space-x-px text-sm">
-
-                {/* Previous */}
                 <li>
                     <button
                         disabled={!previous_page}
@@ -30,7 +28,6 @@ const Pagination = ({ pageInfo, onPageChange }) => {
                     </button>
                 </li>
 
-                {/* Page Numbers */}
                 {Array.from({ length: last_page }, (_, i) => i + 1).map((page) => (
                     <li key={page}>
                         <button
@@ -38,7 +35,7 @@ const Pagination = ({ pageInfo, onPageChange }) => {
                             aria-current={page === current_page ? "page" : undefined}
                             className={`flex items-center justify-center w-10 h-10 border font-medium
                 ${page === current_page
-                                    ? "bg-indigo-600 text-white"
+                                    ? "bg-indigo-600 text-slate-100"
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 }`}
                         >
@@ -47,7 +44,6 @@ const Pagination = ({ pageInfo, onPageChange }) => {
                     </li>
                 ))}
 
-                {/* Next */}
                 <li>
                     <button
                         disabled={!next_page}
@@ -61,7 +57,6 @@ const Pagination = ({ pageInfo, onPageChange }) => {
                         Next
                     </button>
                 </li>
-
             </ul>
         </nav>
     );

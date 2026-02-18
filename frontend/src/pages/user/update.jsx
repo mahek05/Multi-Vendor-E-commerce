@@ -39,8 +39,6 @@ const UserProfileUpdate = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-
         const res = await api("/user/profile", "PUT", formData);
 
         if (res?.success) {
@@ -58,7 +56,6 @@ const UserProfileUpdate = () => {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form className="space-y-6" onSubmit={handleSubmit}>
-
                     <Input
                         label="Name"
                         name="name"
@@ -82,7 +79,6 @@ const UserProfileUpdate = () => {
                     />
 
                     <Button text="Update" type="submit" />
-
                 </form>
             </div>
         </div>

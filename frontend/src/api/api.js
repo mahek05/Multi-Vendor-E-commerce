@@ -26,11 +26,9 @@ export const api = async (
         });
     };
 
-
     let response = await makeRequest(accessToken);
 
     if (response.status === 401) {
-
         const refreshToken = localStorage.getItem("refreshToken");
         if (!refreshToken) {
             localStorage.clear();
@@ -59,7 +57,6 @@ export const api = async (
 
     return response.json();
 };
-
 
 
 // export const api = async (url, method = "GET", body = null) => {

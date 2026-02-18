@@ -30,7 +30,6 @@ const SellerProductsByCategory = () => {
                 Category: {name}
             </h2>
 
-
             <ProductGrid products={products} />
             <Pagination
                 pageInfo={pageInfo}

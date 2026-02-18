@@ -3,27 +3,27 @@ import { useState } from "react";
 import { isLoggedIn } from "../utils/auth";
 import Dropdown from "./Dropdown";
 import { api } from '../api/api';
-import { User, ShoppingCart, LogOut, LogIn, UserPlus, Plus } from "lucide-react";
+import { Users, Store, User, LogOut, LogIn, UserPlus } from "lucide-react";
 
-const SellerNavbar = () => {
+const AdminNavbar = () => {
     const navigate = useNavigate();
     const loggedIn = isLoggedIn();
-    const [query, setQuery] = useState("");
+    // const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
 
     const handleLogout = async () => {
-        const res = await api("/seller/logout", "POST");
+        const res = await api("/admin/logout", "POST");
         if (res.success) {
             localStorage.clear();
-            navigate("/seller/login");
+            navigate("/admin/login");
         }
     };
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (!query.trim()) return;
-        navigate(`/seller/product/category/${query.toLowerCase()}`);
-    };
+    // const handleSearch = (e) => {
+    //     e.preventDefault();
+    //     if (!query.trim()) return;
+    //     navigate(`/seller/product/category/${query.toLowerCase()}`);
+    // };
 
     return (
         <header className="fixed top-0 left-0 right-0 bg-slate-300 border-b border-slate-200 z-40">
@@ -37,40 +37,17 @@ const SellerNavbar = () => {
                     Seller Panel
                 </button> */}
 
-                <Link to="/seller" className="font-bold text-indigo-600 text-lg">
+                <Link to="/admin" className="font-bold text-indigo-600 text-lg">
                     YourStore
                 </Link>
-
-                <form
-                    onSubmit={handleSearch}
-                    className="flex-1 max-w-md flex"
-                >
-                    <input
-                        type="search"
-                        placeholder="Search by category (e.g. phone)"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                e.preventDefault();
-                                navigate(`/seller/product/category/${query.toLowerCase()}`);
-                            }
-                        }}
-                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-
-                    <button type="submit" className="hidden">
-                        Search
-                    </button>
-                </form>
 
                 <div className="ml-auto flex items-center gap-4 relative">
                     {!loggedIn ? (
                         <div className="flex gap-4">
-                            <Link to="/seller/login" className="text-sm font-medium text-slate-700 hover:text-indigo-600">
+                            <Link to="/admin/login" className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200">
                                 <LogIn size={16} />
                             </Link>
-                            <Link to="/seller/signup" className="text-sm font-medium text-slate-700 hover:text-indigo-600">
+                            <Link to="/admin/signup" className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200">
                                 <UserPlus size={16} />
                             </Link>
                         </div>
@@ -78,34 +55,35 @@ const SellerNavbar = () => {
                         <>
 
                             <button
-                                onClick={() => navigate("/add-product")}
+                                onClick={() => navigate("/allUser")}
                                 className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
-                                aria-label="Add Product"
+                                aria-label="View User"
                             >
-                                <Plus size={16} />
+                                <Users size={18} />
+                            </button>
+
+                            <button
+                                onClick={() => navigate("/allSeller")}
+                                className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+                                aria-label="View Seller"
+                            >
+                                <Store size={18} />
                             </button>
 
                             <button
                                 onClick={() => setOpen(!open)}
                                 className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
-                                aria-label="Seller menu"
+                                aria-label="Admin menu"
                             >
-                                <User size={16} />
+                                <User size={18} />
                             </button>
 
                             <Dropdown open={open} onClose={() => setOpen(false)}>
                                 <button
-                                    onClick={() => navigate("/seller/profile")}
+                                    onClick={() => navigate("/admin/profile")}
                                     className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
                                 >
                                     View Profile
-                                </button>
-
-                                <button
-                                    onClick={() => navigate("/seller/orders")}
-                                    className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
-                                >
-                                    Order History
                                 </button>
 
                                 <button
@@ -124,4 +102,4 @@ const SellerNavbar = () => {
     );
 };
 
-export default SellerNavbar;
+export default AdminNavbar;
