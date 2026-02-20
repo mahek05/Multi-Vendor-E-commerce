@@ -33,7 +33,6 @@ exports.handleStripeWebhook = async (req, res) => {
 
     const paymentIntent = event.data.object;
     const user_id = paymentIntent.metadata.user_id;
-
     const transaction = await sequelize.transaction();
 
     try {
@@ -71,7 +70,9 @@ exports.handleStripeWebhook = async (req, res) => {
                 lock: transaction.LOCK.UPDATE
             });
 
-            if (!product) throw new Error("Product not found");
+            if (!product)
+                throw new Error("Product not found");
+
             if (product.stock < item.quantity)
                 throw new Error("Stock changed after payment — manual refund needed");
 
@@ -99,12 +100,10 @@ exports.handleStripeWebhook = async (req, res) => {
         }
 
         await CartItem.destroy({ where: { user_id }, transaction });
-
         await transaction.commit();
-
     } catch (err) {
         await transaction.rollback();
-        console.error("Webhook DB error:", err);
+        console.error("Webhook DB error: ", err);
     }
     res.json({ received: true });
 };

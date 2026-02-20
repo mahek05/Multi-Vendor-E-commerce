@@ -21,6 +21,12 @@ router.get(
     categoryController.getAllCategory
 );
 
+router.get(
+    "/admin/get-category",
+    verifyAdmin,
+    categoryController.getAllCategoryAdmin
+);
+
 router.put(
     "/update/:id",
     verifyAdmin,

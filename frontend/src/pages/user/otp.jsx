@@ -65,6 +65,7 @@ const Otp = () => {
                 <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-slate-900">
                     Verify Email
                 </h2>
+
                 <p className="mt-10 text-center tracking-tight text-slate-600">
                     Enter 6 digit code.
                 </p>
@@ -73,6 +74,7 @@ const Otp = () => {
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form className="space-y-6" onSubmit={handleVerify}>
                     <div className="mb-6 flex justify-center gap-3">
+                        
                         {otp.map((digit, i) => (
                             <input
                                 key={i}

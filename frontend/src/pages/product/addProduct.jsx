@@ -34,14 +34,12 @@ const AddProduct = () => {
         });
 
         const res = await api("/product/create", "POST", fd);
-
         if (res.success) navigate("/seller");
     };
 
 
     return (
         <div className="flex min-h-screen flex-col justify-center px-6 pb-40 lg:px-8 bg-slate-50">
-
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 {/* <img 
           className="mx-auto h-10 w-auto" 
@@ -109,7 +107,6 @@ const AddProduct = () => {
                     />
 
                     <Button text="Create" type="submit" />
-
                 </form>
             </div>
         </div>

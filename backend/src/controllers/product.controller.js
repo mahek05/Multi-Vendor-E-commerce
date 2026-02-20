@@ -41,7 +41,7 @@ exports.createProduct = async (req, res) => {
         });
         return response.success(res, 3001, null, 201);
     } catch (error) {
-        console.error(error);
+        console.error("Create Product Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -77,14 +77,14 @@ exports.updateProduct = async (req, res) => {
             product_name: product_name ?? product.product_name,
             description: description ?? product.description,
             price: price ?? product.price,
-            stock:  (product.stock + stock) ?? product.stock,
+            stock: (product.stock + stock) ?? product.stock,
             image: newImagePath ?? product.image,
             category_id: category_id ?? product.category_id
         });
 
         return response.success(res, 3003, product, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Update Product Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -113,7 +113,7 @@ exports.deleteProduct = async (req, res) => {
 
         return response.success(res, 3004, null, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Delete Product Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -140,7 +140,7 @@ exports.getAllProducts = async (req, res) => {
 
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Get Products Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -169,7 +169,7 @@ exports.getProductById = async (req, res) => {
 
         return response.success(res, null, product, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Get by Product ID Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -196,7 +196,7 @@ exports.getProductBySellerId = async (req, res) => {
         const paginatedResponse = getPaginatedResponse(products, page, limit);
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Error: ", error);
+        console.error("Get Product by Seller ID Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -245,7 +245,7 @@ exports.getProductByCategory = async (req, res) => {
 
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Get Product by Category Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -295,7 +295,7 @@ exports.getSellerProductByCategory = async (req, res) => {
 
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Get Seller Product by Category Error: ", error);
         return response.error(res, 9999);
     }
 };

@@ -9,7 +9,7 @@ const { checkoutSchema } = require("../validators/order.validator");
 router.post(
     "/checkout",
     verifyUser,
-    validate(checkoutSchema),
+    // validate(checkoutSchema),
     orderController.checkout
 );
 
@@ -17,6 +17,12 @@ router.get(
     "/myOrder",
     verifyUser,
     orderController.orderHistory
+);
+
+router.post(
+    "/verify-payment/:payment_intent",
+    verifyUser,
+    orderController.verifyPayment
 );
 
 module.exports = router;

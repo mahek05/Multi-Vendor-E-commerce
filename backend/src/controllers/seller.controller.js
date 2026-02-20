@@ -51,7 +51,7 @@ exports.signup = async (req, res) => {
 
         return response.success(res, 1001, null, 201);
     } catch (error) {
-        console.error(error);
+        console.error("Seller Signup Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
             role: "SELLER"
         }, 200);
     } catch (error) {
-        console.error(error);
+        console.error("Seller Login Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -99,7 +99,7 @@ exports.logout = async (req, res) => {
 
         return response.success(res, 1005, null, 200);
     } catch (error) {
-        console.error(error);
+        console.error("Seller Logout Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -119,7 +119,7 @@ exports.getProfile = async (req, res) => {
 
         return response.success(res, 1010, seller, 200);
     } catch (error) {
-        console.error("Seller profile error:", error);
+        console.error("Seller Profile Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -143,7 +143,7 @@ exports.updateProfile = async (req, res) => {
 
         return response.success(res, 1011, seller, 200);
     } catch (error) {
-        console.error("Update seller profile error:", error);
+        console.error("Update Seller Profile Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -168,47 +168,7 @@ exports.deactivateProfile = async (req, res) => {
 
         return response.success(res, 1012, null, 200);
     } catch (error) {
-        console.error("Deactivate seller error:", error);
-        return response.error(res, 9999);
-    }
-};
-
-exports.onboardStripe = async (req, res) => {
-    try {
-        const { seller_id } = req.seller;
-
-        const seller = await Seller.findOne({ where: { id: seller_id } });
-
-        if (!seller) {
-            return response.error(res, 1006, 404);
-        }
-
-        if (!seller.stripe_account_id) {
-            const account = await stripe.accounts.create({
-                type: 'express',
-                email: seller.email,
-                country: 'US',
-                capabilities: {
-                    card_payments: { requested: true },
-                    transfers: { requested: true },
-                },
-            });
-
-            seller.stripe_account_id = account.id;
-            await seller.save();
-        }
-
-        const accountLink = await stripe.accountLinks.create({
-            account: seller.stripe_account_id,
-            refresh_url: 'http://localhost:5173/seller/dashboard',
-            return_url: 'http://localhost:5173/seller/dashboard',
-            type: 'account_onboarding',
-        });
-
-        return response.success(res, 1025, { url: accountLink.url }, 200);
-
-    } catch (error) {
-        console.error("Stripe Onboarding Error:", error);
+        console.error("Deactivate Seller Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -234,7 +194,7 @@ exports.onboardStripe = async (req, res) => {
 
         return response.success(res, 1025, { url }, 200);
     } catch (error) {
-        console.error("Stripe Onboarding Error:", error);
+        console.error("Seller Stripe Onboarding Error:", error);
         return response.error(res, 9999);
     }
 };

@@ -36,7 +36,6 @@ const Login = () => {
 
     return (
         <div className="flex min-h-screen flex-col justify-center px-6 pt-12 pb-40 lg:px-8 bg-slate-50">
-
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 {/* <img 
           className="mx-auto h-10 w-auto" 

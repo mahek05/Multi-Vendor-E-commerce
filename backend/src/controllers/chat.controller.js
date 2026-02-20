@@ -164,7 +164,7 @@ exports.createPrivateChat = async (req, res) => {
 
         return response.success(res, 6005, null, 200);
     } catch (error) {
-        console.error(error);
+        console.error("Create Private Chat Error: ", error);
         return response.error(res, 9999);
     }
 };

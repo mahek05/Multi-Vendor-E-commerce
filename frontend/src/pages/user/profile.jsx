@@ -42,33 +42,45 @@ const SellerProfile = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-8 text-sm">
                         <div>
-                            <p className="text-xs text-slate-500">Name</p>
+                            <p className="text-xs text-slate-500">
+                                Name
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.name}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs text-slate-500">Email</p>
+                            <p className="text-xs text-slate-500">
+                                Email
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.email}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs text-slate-500">Phone Number</p>
+                            <p className="text-xs text-slate-500">
+                                Phone Number
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.phone_number}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs text-slate-500">Address</p>
+                            <p className="text-xs text-slate-500">
+                                Address
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.address}
                             </p>
                         </div>
-                        
+
                         <div className="mt-4 flex justify-between">
                             <button
                                 onClick={handleUpdate}

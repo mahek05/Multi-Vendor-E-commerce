@@ -1,3 +1,4 @@
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { api } from "../../api/api";
 
@@ -6,6 +7,7 @@ const API_BASE_URL = "http://localhost:5000";
 const Cart = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const fetchCart = async () => {
         setLoading(true);
@@ -68,19 +70,18 @@ const Cart = () => {
                 </h2>
 
                 <div className="space-y-4">
+
                     {items.map((item) => (
                         <div
                             key={item.id}
                             className="bg-white rounded-lg border border-slate-200 p-4 flex gap-4 items-start"
                         >
-                            {/* Image */}
                             <img
                                 src={`${API_BASE_URL}${item.product.image}`}
                                 alt={item.product.product_name}
                                 className="w-30 h-20 object-cover rounded-md border"
                             />
 
-                            {/* Details */}
                             <div className="flex-1">
                                 <div className="flex justify-between items-start">
                                     <h5 className="text-base font-medium text-slate-900 leading-snug max-w-[80%]">
@@ -93,7 +94,6 @@ const Cart = () => {
                                 </div>
 
                                 <div className="mt-3 flex items-center justify-between">
-                                    {/* Quantity */}
                                     <div className="flex items-center rounded-md">
                                         <button
                                             onClick={() => decrementQty(item)}
@@ -114,7 +114,6 @@ const Cart = () => {
                                         </button>
                                     </div>
 
-                                    {/* Price */}
                                     <h6 className="text-sm font-semibold text-slate-900">
                                         ₹{item.quantity * item.product.price}
                                     </h6>
@@ -123,18 +122,21 @@ const Cart = () => {
                         </div>
                     ))}
 
-                    {/* Subtotal */}
                     <div className="mt-8 bg-white border border-slate-200 rounded-lg p-4">
                         <div className="flex justify-between items-center mb-4">
                             <span className="text-sm font-medium text-slate-700">
                                 Subtotal
                             </span>
+
                             <span className="text-lg font-semibold text-slate-900">
                                 ₹{subtotal}
                             </span>
                         </div>
 
-                        <button className="w-full rounded-md py-3 bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition">
+                        <button
+                            onClick={() => navigate("/checkout")}
+                            className="w-full rounded-md py-3 bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
+                        >
                             Proceed to Checkout
                         </button>
 

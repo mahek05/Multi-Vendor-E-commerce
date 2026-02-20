@@ -15,7 +15,6 @@ const AdminProfile = () => {
 
             setProfile(res.data);
         };
-
         fetchProfile();
     }, []);
 
@@ -35,23 +34,27 @@ const AdminProfile = () => {
     return (
         <div className="min-h-screen bg-slate-50 py-10 px-4">
             <div className="max-w-4xl mx-auto space-y-6">
-
                 <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                     <h3 className="text-sm font-medium text-slate-500 mb-4">
                         Account Information
                     </h3>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-8 text-sm">
-
                         <div>
-                            <p className="text-xs text-slate-500">Name</p>
+                            <p className="text-xs text-slate-500">
+                                Name
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.name}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs text-slate-500">Email</p>
+                            <p className="text-xs text-slate-500">
+                                Email
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.email}
                             </p>
@@ -67,8 +70,8 @@ const AdminProfile = () => {
                         </button>
                     </div>
                 </div>
-
             </div>
+
             {confirmOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
@@ -98,7 +101,7 @@ const AdminProfile = () => {
                     </div>
                 </div>
             )}
-        </div >
+        </div>
     );
 }
 

@@ -72,7 +72,7 @@ exports.updateStatus = async (req, res) => {
 
         return response.success(res, 5007, order_item, 200);
     } catch (error) {
-        console.error("Update error:", error);
+        console.error("Order Item Status Update Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -140,7 +140,7 @@ exports.cancelOrderItem = async (req, res) => {
 
     } catch (error) {
         await t.rollback();
-        console.error("Cancel OrderItem error:", error);
+        console.error("Cancel Order Item error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -202,7 +202,7 @@ exports.requestReturn = async (req, res) => {
 
     } catch (error) {
         await t.rollback();
-        console.error("Return error:", error);
+        console.error("Return Request Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -247,7 +247,7 @@ exports.sellerOrderHistory = async (req, res) => {
         return response.success(res, null, paginatedResponse, 200);
 
     } catch (error) {
-        console.error("Seller Order History Error:", error);
+        console.error("Seller Order History Error: ", error);
         return response.error(res, 9999);
     }
 };

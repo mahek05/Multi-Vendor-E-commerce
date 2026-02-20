@@ -3,7 +3,7 @@ import { useState } from "react";
 import { isLoggedIn } from "../utils/auth";
 import Dropdown from "./Dropdown";
 import { api } from '../api/api';
-import { User, ShoppingCart, LogOut, LogIn, UserPlus, Plus } from "lucide-react";
+import { User, LogOut, LogIn, UserPlus, Plus } from "lucide-react";
 
 const SellerNavbar = () => {
     const navigate = useNavigate();
@@ -110,7 +110,7 @@ const SellerNavbar = () => {
 
                                 <button
                                     onClick={handleLogout}
-                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-slate-100 flex items-center gap-2"
+                                    className="w-full px-4 py-2 text-left text-sm text-red-800 hover:bg-slate-100 flex items-center gap-2"
                                 >
                                     <LogOut size={16} />
                                     <span>Logout</span>

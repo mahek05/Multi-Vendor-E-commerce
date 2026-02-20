@@ -32,7 +32,7 @@ exports.createCartItem = async (req, res) => {
 
         return response.success(res, 4001, newItem, 201);
     } catch (error) {
-        console.error(error);
+        console.error("Create Cart Item Error", error);
         return response.error(res, 9999);
     }
 };
@@ -56,7 +56,7 @@ exports.updateCartItem = async (req, res) => {
 
         return response.success(res, 4003, cartItem, 200);
     } catch (error) {
-        console.error("Update category error:", error);
+        console.error("Update Cart Item Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -79,7 +79,7 @@ exports.deleteCartItem = async (req, res) => {
 
         return response.success(res, 4004, null, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Delete Cart Item Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -113,7 +113,7 @@ exports.getAllCartItem = async (req, res) => {
 
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Get all category error:", error);
+        console.error("Get Cart Item Error: ", error);
         return response.error(res, 9999);
     }
 };

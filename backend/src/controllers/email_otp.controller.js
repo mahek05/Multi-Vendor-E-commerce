@@ -51,7 +51,7 @@ exports.send_otp = async (req, res) => {
 
         return response.success(res, 1013, null, 200);
     } catch (error) {
-        console.error("Send OTP error:", error);
+        console.error("Send OTP error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -81,7 +81,7 @@ exports.verify_otp = async (req, res) => {
 
         return response.success(res, 1016, null, 200);
     } catch (error) {
-        console.error("Verify OTP error:", error);
+        console.error("Verify OTP error: ", error);
         return response.error(res, 9999);
     }
 };

@@ -27,11 +27,16 @@ import AdminSignup from './pages/admin/signup';
 import AdminLogin from './pages/admin/login';
 import AdminOtp from './pages/admin/otp';
 import AdminProfile from './pages/admin/profile';
+import AdminDashboard from './pages/admin/dashboard';
+import Sellers from './pages/admin/getSeller';
+import Users from './pages/admin/getUser';
+import ViewCategory from './pages/admin/category';
+import Checkout from './pages/payment/checkout';
+import PaymentResult from './pages/payment/paymentSuccess';
 
 function App() {
     return (
         <BrowserRouter>
-
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
@@ -42,7 +47,7 @@ function App() {
                 <Route path="/admin/signup" element={<AdminSignup />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/otp" element={<AdminOtp />} />
-                
+
                 <Route element={<UserLayout />}>
                     <Route path="/products" element={<AllProducts />} />
                     <Route path="/category/:id" element={<ProductsByCategory />} />
@@ -52,6 +57,8 @@ function App() {
                     <Route path="/order/orderHistory" element={<OrderHistory />} />
                     <Route path="/profile" element={<UserProfile/>} />
                     <Route path="/update" element={<UserProfileUpdate/>} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/payment-success" element={<PaymentResult />} />
                 </Route>
 
                 <Route element={<SellerLayout />}>
@@ -67,7 +74,10 @@ function App() {
 
                 <Route element={<AdminLayout />}>
                     <Route path="/admin/profile" element={<AdminProfile/>} />
-                    <Route path="/admin" element={<AdminProfile/>} />
+                    <Route path="/admin/dashboard" element={<AdminDashboard/>} />
+                    <Route path="/admin/allSeller" element={<Sellers/>} />
+                    <Route path="/admin/allUser" element={<Users/>} />
+                    <Route path="/admin/categories" element={<ViewCategory/>} />
                 </Route>
             </Routes>
         </BrowserRouter>

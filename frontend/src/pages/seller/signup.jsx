@@ -103,7 +103,7 @@ const SellerSignup = () => {
                     </Link>
                 </p>
             </div>
-        </div >
+        </div>
     );
 };
 

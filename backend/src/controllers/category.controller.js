@@ -14,7 +14,7 @@ exports.createCategory = async (req, res) => {
         });
         return response.success(res, 2001, null, 201);
     } catch (error) {
-        console.error(error);
+        console.error("Create Category Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -40,7 +40,7 @@ exports.updateCategory = async (req, res) => {
 
         return response.success(res, 2004, category, 200);
     } catch (error) {
-        console.error("Update category error:", error);
+        console.error("Update Category Error:", error);
         return response.error(res, 9999);
     }
 };
@@ -63,7 +63,7 @@ exports.deleteCategory = async (req, res) => {
 
         return response.success(res, 2003, null, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Delete Category Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -89,7 +89,34 @@ exports.getAllCategory = async (req, res) => {
 
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Get all category error:", error);
+        console.error("Get Category Error: ", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getAllCategoryAdmin = async (req, res) => {
+    try {
+        const { page, limit, offset } = getPaginationMetadata(
+            req.query.page,
+            req.query.limit
+        );
+
+        const categories = await Category.findAndCountAll({
+            paranoid: false,
+            limit,
+            offset,
+            order: [["created_at", "DESC"]],
+        });
+
+        const paginatedResponse = getPaginatedResponse(
+            categories,
+            page,
+            limit
+        );
+
+        return response.success(res, null, paginatedResponse, 200);
+    } catch (error) {
+        console.error("Get Category for Admin Error: ", error);
         return response.error(res, 9999);
     }
 };

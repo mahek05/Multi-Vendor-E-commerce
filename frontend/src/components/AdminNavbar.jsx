@@ -8,7 +8,6 @@ import { Users, Store, User, LogOut, LogIn, UserPlus } from "lucide-react";
 const AdminNavbar = () => {
     const navigate = useNavigate();
     const loggedIn = isLoggedIn();
-    // const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
 
     const handleLogout = async () => {
@@ -37,7 +36,7 @@ const AdminNavbar = () => {
                     Seller Panel
                 </button> */}
 
-                <Link to="/admin" className="font-bold text-indigo-600 text-lg">
+                <Link to="/admin/dashboard" className="font-bold text-indigo-600 text-lg">
                     YourStore
                 </Link>
 
@@ -53,9 +52,8 @@ const AdminNavbar = () => {
                         </div>
                     ) : (
                         <>
-
                             <button
-                                onClick={() => navigate("/allUser")}
+                                onClick={() => navigate("/admin/allUser")}
                                 className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
                                 aria-label="View User"
                             >
@@ -63,7 +61,7 @@ const AdminNavbar = () => {
                             </button>
 
                             <button
-                                onClick={() => navigate("/allSeller")}
+                                onClick={() => navigate("/admin/allSeller")}
                                 className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
                                 aria-label="View Seller"
                             >
@@ -87,8 +85,15 @@ const AdminNavbar = () => {
                                 </button>
 
                                 <button
+                                    onClick={() => navigate("/admin/categories")}
+                                    className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                                >
+                                    View Category
+                                </button>
+
+                                <button
                                     onClick={handleLogout}
-                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-slate-100 flex items-center gap-2"
+                                    className="w-full px-4 py-2 text-left text-sm text-red-800 hover:bg-slate-100 flex items-center gap-2"
                                 >
                                     <LogOut size={16} />
                                     <span>Logout</span>

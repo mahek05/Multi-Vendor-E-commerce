@@ -1,11 +1,13 @@
-const Admin = require("../models/admin.model");
-const AuthToken = require("../models/auth_token.model");
-const EmailOtp = require("../models/email_otp.model");
-const Seller = require("../models/seller.model");
-const User = require("../models/user.model")
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const response = require('../helpers');
+const { Op } = require("sequelize");
+const Admin = require("../models/admin.model");
+const EmailOtp = require("../models/email_otp.model");
+const User = require("../models/user.model");
+const Payout = require("../models/payout.model");
+const Seller = require("../models/seller.model");
+const Product = require("../models/product.model");
+const OrderItem = require("../models/order_item.model");
 const {
     getPaginationMetadata,
     getPaginatedResponse
@@ -54,7 +56,7 @@ exports.signup = async (req, res) => {
 
         return response.success(res, 1001, null, 201);
     } catch (error) {
-        console.error(error);
+        console.error("Admin Signup Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -86,7 +88,7 @@ exports.login = async (req, res) => {
             role: "ADMIN"
         }, 200);
     } catch (error) {
-        console.error(error);
+        console.error("Admin Login Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -102,7 +104,7 @@ exports.logout = async (req, res) => {
 
         return response.success(res, 1005, null, 200);
     } catch (error) {
-        console.error(error);
+        console.error("Admin Logout Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -122,7 +124,7 @@ exports.getProfile = async (req, res) => {
 
         return response.success(res, 1010, admin, 200);
     } catch (error) {
-        console.error("Admin profile error:", error);
+        console.error("Admin Profile Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -144,7 +146,7 @@ exports.updateProfile = async (req, res) => {
 
         return response.success(res, 1011, admin, 200);
     } catch (error) {
-        console.error("Update admin profile error:", error);
+        console.error("Update Admin Profile Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -169,7 +171,7 @@ exports.deactivateProfile = async (req, res) => {
 
         return response.success(res, 1012, null, 200);
     } catch (error) {
-        console.error("Deactivate admin error:", error);
+        console.error("Deactivate Admin Account Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -200,7 +202,7 @@ exports.sellerStatus = async (req, res) => {
 
         return response.success(res, 1021, null, 201);
     } catch (error) {
-        console.error(error);
+        console.error("Seller Status Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -213,7 +215,7 @@ exports.getSeller = async (req, res) => {
         );
 
         const sellers = await Seller.findAndCountAll({
-            attributes: ["name", "email", "phone_number", "address", "status", "deleted_at"],
+            attributes: ["id", "name", "email", "phone_number", "address", "status"],
             paranoid: false,
             include: [
                 {
@@ -235,7 +237,7 @@ exports.getSeller = async (req, res) => {
 
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Get Seller Error:", error);
         return response.error(res, 9999);
     }
 };
@@ -248,7 +250,7 @@ exports.getUser = async (req, res) => {
         );
 
         const user = await User.findAndCountAll({
-            attributes: ["name", "email", "phone_number", "address", "deleted_at"],
+            attributes: ["id", "name", "email", "phone_number", "address", "deleted_at"],
             paranoid: false,
             limit,
             offset,
@@ -263,7 +265,59 @@ exports.getUser = async (req, res) => {
 
         return response.success(res, null, paginatedResponse, 200);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Get User Error:", error);
         return response.error(res, 9999);
+    }
+};
+
+exports.getDashboard = async (req, res) => {
+    try {
+        const activeUsers = await User.count();
+
+        const activeSellers = await Seller.count({
+            where: { status: "Approved" }
+        });
+
+        const totalProducts = await Product.count();
+        const totalOrders = await OrderItem.count();
+
+        const returnedOrders = await OrderItem.count({
+            where: {
+                status: {
+                    [Op.in]: ["Refunded", "Return Request Approved", "Order Cancelled", "Return Requested"]
+                }
+            }
+        });
+
+        const revenueData = await OrderItem.sum("price", {
+            where: {
+                status: {
+                    [Op.in]: ["Order Placed", "Delivered", "Return Request Not Approved"]
+                }
+            }
+        });
+
+        const returnRate = totalOrders
+            ? ((returnedOrders / totalOrders) * 100).toFixed(2)
+            : 0;
+
+        const pendingPayout = await Payout.sum("amount", {
+            where: { status: "Pending" }
+        });
+
+        return res.json({
+            success: true,
+            data: {
+                activeUsers,
+                activeSellers,
+                totalProducts,
+                revenue: revenueData || 0,
+                returnRate,
+                pendingPayout
+            }
+        });
+    } catch (error) {
+        console.error("Dashboard error:", error);
+        return res.status(500).json({ success: false });
     }
 };

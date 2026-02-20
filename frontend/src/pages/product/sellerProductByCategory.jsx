@@ -14,13 +14,12 @@ const SellerProductsByCategory = () => {
         const fetchCategoryProducts = async () => {
             const res = await api(`/product/getBySellerCategory/${name}?page=${page}`, "GET");
 
-            if (!res.success) return;
+            if (!res.success) 
+                return;
 
-            // setProducts(res.data?.page_data || []);
             setProducts(res.data.page_data);
             setPageInfo(res.data.page_information);
         };
-
         fetchCategoryProducts();
     }, [name, page]);
 
@@ -37,7 +36,6 @@ const SellerProductsByCategory = () => {
             />
         </div>
     );
-
 };
 
 export default SellerProductsByCategory;

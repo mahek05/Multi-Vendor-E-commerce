@@ -13,14 +13,11 @@ const ProductsByCategory = () => {
     useEffect(() => {
         const fetchCategoryProducts = async () => {
             const res = await api(`/product/getByCategory/${name}?page=${page}`, "GET");
-
             if (!res.success) return;
 
-            // setProducts(res.data?.page_data || []);
             setProducts(res.data.page_data);
             setPageInfo(res.data.page_information);
         };
-
         fetchCategoryProducts();
     }, [name, page]);
 
@@ -37,7 +34,6 @@ const ProductsByCategory = () => {
             />
         </div>
     );
-
 };
 
 export default ProductsByCategory;

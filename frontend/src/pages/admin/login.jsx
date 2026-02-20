@@ -27,7 +27,7 @@ const AdminLogin = () => {
                 localStorage.setItem("refreshToken", refresh_token);
                 localStorage.setItem("role", role);
 
-                navigate("/admin");
+                navigate("/admin/dashboard");
             }
         } catch (error) {
             console.error("Login Error: ", error);
@@ -36,7 +36,6 @@ const AdminLogin = () => {
 
     return (
         <div className="flex min-h-screen flex-col justify-center px-6 pt-12 pb-40 lg:px-8 bg-slate-50">
-
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 {/* <img 
           className="mx-auto h-10 w-auto" 
@@ -50,7 +49,6 @@ const AdminLogin = () => {
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form className="space-y-6" onSubmit={handleSubmit}>
-
                     <Input
                         label="Email address"
                         name="email"
@@ -78,7 +76,6 @@ const AdminLogin = () => {
                     </div> */}
 
                     <Button text="Sign in" type="submit" />
-
                 </form>
 
                 <p className="mt-10 text-center text-sm text-gray-500">

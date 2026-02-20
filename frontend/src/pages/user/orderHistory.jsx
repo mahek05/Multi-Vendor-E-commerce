@@ -34,6 +34,7 @@ const OrderHistory = () => {
                 </h2>
 
                 <div className="space-y-4">
+
                     {orders.map((order) => {
                         const rawDate =
                             order.created_at ||
@@ -58,6 +59,7 @@ const OrderHistory = () => {
                                         <p className="text-sm text-slate-500">
                                             Order ID
                                         </p>
+
                                         <p className="text-sm font-medium text-slate-900">
                                             #{order.id.slice(0, 8)}
                                         </p>
@@ -67,6 +69,7 @@ const OrderHistory = () => {
                                         <p className="text-sm text-slate-500">
                                             Ordered on
                                         </p>
+
                                         <p className="text-sm font-medium text-slate-900">
                                             {formattedDate}
                                         </p>

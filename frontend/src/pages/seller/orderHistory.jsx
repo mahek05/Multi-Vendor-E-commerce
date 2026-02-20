@@ -75,6 +75,7 @@ const SellerOrders = () => {
                                 year: "numeric",
                             })
                             : "—";
+
                         return (
                             <div
                                 key={order.id}
@@ -85,8 +86,9 @@ const SellerOrders = () => {
                                         <p className="text-sm text-slate-500">
                                             Order ID
                                         </p>
+
                                         <p className="text-sm font-medium text-slate-900">
-                                            #{order.id.slice(0, 8)}
+                                            #{order.id?.slice(0, 8)}
                                         </p>
                                     </div>
 
@@ -94,8 +96,9 @@ const SellerOrders = () => {
                                         <p className="text-sm text-slate-500">
                                             Payout ID
                                         </p>
+
                                         <p className="text-sm font-medium text-slate-900">
-                                            #{order.payout.id.slice(0, 8)}
+                                            #{order.payout?.id?.slice(0, 8)}
                                         </p>
                                     </div>
 
@@ -103,6 +106,7 @@ const SellerOrders = () => {
                                         <p className="text-sm text-slate-500">
                                             Ordered on
                                         </p>
+
                                         <p className="text-sm font-medium text-slate-900">
                                             {formattedDate}
                                         </p>
@@ -139,7 +143,6 @@ const SellerOrders = () => {
                                     </div>
 
                                     <div className="flex justify-between items-start mt-4 border-t border-slate-100 pt-4">
-
                                         <div className="relative">
                                             <button
                                                 onClick={() => setOpenId(openId === order.id ? null : order.id)}
@@ -183,9 +186,11 @@ const SellerOrders = () => {
                                         </div>
 
                                         <div className="flex flex-col items-end space-y-3">
-
                                             <div className="text-right">
-                                                <p className="text-xs text-slate-500">Order Status</p>
+                                                <p className="text-xs text-slate-500">
+                                                    Order Status
+                                                </p>
+
                                                 <span
                                                     className={`text-xs font-normal px-2 py-1 rounded-full border
                                                         ${order.status === "Delivered"
@@ -200,7 +205,10 @@ const SellerOrders = () => {
                                             </div>
 
                                             <div className="text-right">
-                                                <p className="text-xs text-slate-500">Payout Status</p>
+                                                <p className="text-xs text-slate-500">
+                                                    Payout Status
+                                                </p>
+
                                                 <span
                                                     className={`text-xs font-normal px-2 py-1 rounded-full border
                                                         ${order.payout.status === "Paid"
@@ -226,7 +234,6 @@ const SellerOrders = () => {
                 pageInfo={pageInfo}
                 onPageChange={(newPage) => setPage(newPage)}
             />
-
         </section>
     );
 };

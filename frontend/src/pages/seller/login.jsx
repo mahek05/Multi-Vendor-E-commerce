@@ -76,7 +76,6 @@ const SellerLogin = () => {
                     </div> */}
 
                     <Button text="Sign in" type="submit" />
-
                 </form>
 
                 <p className="mt-10 text-center text-sm text-gray-500">

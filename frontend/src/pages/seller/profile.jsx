@@ -42,35 +42,50 @@ const SellerProfile = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-8 text-sm">
                         <div>
-                            <p className="text-xs text-slate-500">Name</p>
+                            <p className="text-xs text-slate-500">
+                                Name
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.name}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs text-slate-500">Email</p>
+                            <p className="text-xs text-slate-500">
+                                Email
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.email}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs text-slate-500">Phone Number</p>
+                            <p className="text-xs text-slate-500">
+                                Phone Number
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.phone_number}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs text-slate-500">Address</p>
+                            <p className="text-xs text-slate-500">
+                                Address
+                            </p>
+
                             <p className="mt-1 font-medium text-slate-900 break-words">
                                 {profile.address}
                             </p>
                         </div>
 
                         <div className="flex justify-between">
-                            <p className="text-xs text-slate-500">Status</p>
+                            <p className="text-xs text-slate-500">
+                                Status
+                            </p>
+
                             <span className={`px-3 py-1 rounded-full text-xs font-medium
                                 ${profile.status === "Approved"
                                     ? "bg-green-100 text-green-700"
@@ -81,6 +96,7 @@ const SellerProfile = () => {
                             </span>
                         </div>
                     </div>
+
                     <div className="mt-4 flex justify-between">
                         <button
                             onClick={handleUpdate}
@@ -98,10 +114,9 @@ const SellerProfile = () => {
                     </div>
                 </div>
             </div>
-            
+
             {confirmOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-
                     <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
                         <h3 className="text-lg font-semibold text-gray-900 text-center">
                             Are you sure you want to continue?
@@ -129,7 +144,7 @@ const SellerProfile = () => {
                     </div>
                 </div>
             )}
-        </div >
+        </div>
     );
 }
 

@@ -66,24 +66,37 @@ const ProductDetails = () => {
                         </h1>
 
                         <div className="py-6">
-                            <h3 className="sr-only">Description</h3>
+                            <h3 className="sr-only">
+                                Description
+                            </h3>
+
                             <div className="space-y-6 text-sm text-gray-700">
-                                <p>{product.description}</p>
+                                <p>
+                                    {product.description}
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     <div className="mt-8 lg:col-span-3 lg:mt-0">
                         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                            <h2 className="sr-only">Product information</h2>
+                            <h2 className="sr-only">
+                                Product information
+                            </h2>
 
                             <p className="text-3xl tracking-tight text-gray-900">
-                                <sup className="text-sm top-[-0.5em]">₹</sup>{product.price}
+                                <sup className="text-sm top-[-0.5em]">
+                                    ₹
+                                </sup>
+                                {product.price}
                             </p>
 
                             <div className="mt-4">
                                 <p className="text-sm text-gray-500">
-                                    Delivery by <span className="font-bold text-gray-900">{formattedDelivery}</span>
+                                    Delivery by
+                                    <span className="font-bold text-gray-900">
+                                        {formattedDelivery}
+                                    </span>
                                 </p>
 
                                 {inStock ? (
@@ -100,7 +113,10 @@ const ProductDetails = () => {
                             {role === "USER" && (
                                 <>
                                     <div className="mb-4">
-                                        <label htmlFor="quantity" className="inline">Qty: </label>
+                                        <label htmlFor="quantity" className="inline">
+                                            Qty:
+                                        </label>
+
                                         <select
                                             id="quantity"
                                             name="quantity"
@@ -110,7 +126,9 @@ const ProductDetails = () => {
                                             className="block w-full rounded-md border-gray-300 py-1.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm disabled:bg-gray-100"
                                         >
                                             {[1, 2, 3, 4].map(n => (
-                                                <option key={n} value={n}>{n}</option>
+                                                <option key={n} value={n}>
+                                                    {n}
+                                                </option>
                                             ))}
                                         </select>
                                     </div>
@@ -147,11 +165,20 @@ const ProductDetails = () => {
 
                             <div className="mt-4 text-xs text-gray-500 space-y-1">
                                 <p className="grid grid-cols-2">
-                                    <span>Ships from</span>
-                                    <span className="text-slate-900 font-medium">{product.seller?.address}</span>
+                                    <span>
+                                        Ships from
+                                    </span>
+
+                                    <span className="text-slate-900 font-medium">
+                                        {product.seller?.address}
+                                    </span>
                                 </p>
+
                                 <p className="grid grid-cols-2">
-                                    <span>Sold by</span>
+                                    <span>
+                                        Sold by
+                                    </span>
+
                                     <span className="text-slate-900 font-medium truncate">
                                         {product.seller?.name || "Unknown Seller"}
                                     </span>

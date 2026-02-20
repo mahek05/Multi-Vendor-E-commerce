@@ -8,7 +8,6 @@ const Payout = require("../models/payout.model");
 const { createRefund } = require("../helpers/stripe.helper");
 
 exports.refundOrderItems = async () => {
-
     const orderItems = await OrderItem.findAll({
         where: {
             status: { [Op.or]: ["Order Cancelled", "Return Request Approved"] },

@@ -68,6 +68,6 @@ exports.processPayouts = async () => {
         await transaction.commit();
     } catch (error) {
         await transaction.rollback();
-        console.error("Payout error:", error);
+        console.error("Payout Error: ", error);
     }
 };

@@ -49,7 +49,7 @@ router.delete(
     adminController.deactivateProfile
 );
 
-router.post(
+router.put(
     "/sellerStatus/:id",
     verifyAdmin,
     adminController.sellerStatus
@@ -65,6 +65,12 @@ router.get(
     "/getUser",
     verifyAdmin,
     adminController.getUser
+);
+
+router.get(
+    "/dashboard",
+    verifyAdmin,
+    adminController.getDashboard
 );
 
 module.exports = router;

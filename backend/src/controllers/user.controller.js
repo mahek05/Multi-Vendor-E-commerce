@@ -51,7 +51,7 @@ exports.signup = async (req, res) => {
 
         return response.success(res, 1001, null, 201);
     } catch (error) {
-        console.error(error);
+        console.error("User Signup Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
             role: "USER"
         }, 200);
     } catch (error) {
-        console.error(error);
+        console.error("User Login Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -99,7 +99,7 @@ exports.logout = async (req, res) => {
 
         return response.success(res, 1005, null, 200);
     } catch (error) {
-        console.error(error);
+        console.error("User Logout Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -119,7 +119,7 @@ exports.getProfile = async (req, res) => {
 
         return response.success(res, 1010, user, 200);
     } catch (error) {
-        console.error("Admin profile error:", error);
+        console.error("User Profile Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -143,7 +143,7 @@ exports.updateProfile = async (req, res) => {
 
         return response.success(res, 1011, user, 200);
     } catch (error) {
-        console.error("Update user profile error:", error);
+        console.error("Update User Profile Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -168,7 +168,7 @@ exports.deactivateProfile = async (req, res) => {
 
         return response.success(res, 1012, null, 200);
     } catch (error) {
-        console.error("Deactivate user error:", error);
+        console.error("Deactivate User Error: ", error);
         return response.error(res, 9999);
     }
 };
@@ -192,7 +192,7 @@ exports.onboardStripe = async (req, res) => {
 
         return response.success(res, 1025, { url }, 200);
     } catch (error) {
-        console.error("Stripe User Onboarding Error:", error);
+        console.error("Stripe User Onboarding Error: ", error);
         return response.error(res, 9999);
     }
 };

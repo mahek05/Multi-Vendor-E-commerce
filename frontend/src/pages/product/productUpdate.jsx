@@ -44,15 +44,14 @@ const UpdateProduct = () => {
         e.preventDefault();
 
         const payload = {
-        product_name: formData.product_name.trim(),
-        description: formData.description.trim(),
-        price: Number(formData.price),
-        stock: formData.stock === "" ? undefined : Number(formData.stock),
-        category_id: formData.category_id || undefined
-    };
+            product_name: formData.product_name.trim(),
+            description: formData.description.trim(),
+            price: Number(formData.price),
+            stock: formData.stock === "" ? undefined : Number(formData.stock),
+            category_id: formData.category_id || undefined
+        };
 
         const res = await api(`/product/update/${id}`, "PUT", payload);
-
         if (res?.success) navigate(`/seller/product/${id}`);
     };
 
@@ -104,7 +103,6 @@ const UpdateProduct = () => {
                     />
 
                     <Button text="Update Product" type="submit" />
-                    
                 </form>
             </div >
         </div>
