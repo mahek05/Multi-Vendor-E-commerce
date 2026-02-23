@@ -3,7 +3,7 @@ import { useState } from "react";
 import { isLoggedIn } from "../utils/auth";
 import { api } from "../api/api";
 import Dropdown from "./Dropdown";
-import { User, ShoppingCart, LogOut, LogIn, UserPlus } from "lucide-react";
+import { User, ShoppingCart, LogOut, LogIn, UserPlus, MessageCircle } from "lucide-react";
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -82,6 +82,14 @@ const Navbar = () => {
                         </div>
                     ) : (
                         <>
+                            <button
+                                onClick={() => navigate("/user/messages")}
+                                className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+                                aria-label="Cart"
+                            >
+                                <MessageCircle size={18} />
+                            </button>
+
                             <button
                                 onClick={() => navigate("/cart")}
                                 className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"

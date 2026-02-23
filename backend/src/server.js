@@ -11,8 +11,11 @@ const socketHandler = require("./socket/socketHandler");
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
-const io = new Server(server, {
-    cors: { origin: "*" }
+const io = require("socket.io")(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        credentials: true
+    }
 });
 
 io.use(socketAuthMiddleware);

@@ -28,12 +28,6 @@ module.exports = (io) => {
                     return socket.emit("room_joined", { roomId, status: "already_joined" });
                 }
 
-                // if (userRole === "ADMIN") {
-                //     socket.join(roomId);
-                //     socket.to(roomId).emit("onlineStatus", { userId, isOnline: true });
-                //     return socket.emit("room_joined", { roomId, status: "success" });
-                // }
-
                 const participant = await RoomParticipant.findOne({
                     where: {
                         room_id: roomId,
@@ -50,7 +44,6 @@ module.exports = (io) => {
                 } else {
                     socket.emit("error", { message: "Access denied." });
                 }
-
             } catch (err) {
                 console.error("Join Room Error:", err);
                 socket.emit("error", { message: "Failed to join room" });

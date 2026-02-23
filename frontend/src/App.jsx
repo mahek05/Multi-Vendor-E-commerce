@@ -33,6 +33,8 @@ import Users from './pages/admin/getUser';
 import ViewCategory from './pages/admin/category';
 import Checkout from './pages/payment/checkout';
 import PaymentResult from './pages/payment/paymentSuccess';
+import ChatList from './pages/chat/index';
+import Chat from './pages/chat/chatMessage';
 
 function App() {
     return (
@@ -55,10 +57,12 @@ function App() {
                     <Route path="/product/category/:name" element={<ProductsByCategory />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/order/orderHistory" element={<OrderHistory />} />
-                    <Route path="/profile" element={<UserProfile/>} />
-                    <Route path="/update" element={<UserProfileUpdate/>} />
+                    <Route path="/profile" element={<UserProfile />} />
+                    <Route path="/update" element={<UserProfileUpdate />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/payment-success" element={<PaymentResult />} />
+                    <Route path="/user/messages" element={<ChatList />} />
+                    <Route path="/chat/:roomId" element={<Chat />} />
                 </Route>
 
                 <Route element={<SellerLayout />}>
@@ -66,18 +70,18 @@ function App() {
                     <Route path="/seller" element={<SellerProducts />} />
                     <Route path="/seller/product/:id" element={<ProductDetails />} />
                     <Route path="/seller/product/category/:name" element={<SellerProductsByCategory />} />
-                    <Route path="/add-product" element={<AddProduct/>} />
-                    <Route path="/seller/profile" element={<SellerProfile/>} />
-                    <Route path="/seller/update" element={<SellerProfileUpdate/>} />
-                    <Route path="/seller/product/update/:id" element={<UpdateProduct/>} />
+                    <Route path="/add-product" element={<AddProduct />} />
+                    <Route path="/seller/profile" element={<SellerProfile />} />
+                    <Route path="/seller/update" element={<SellerProfileUpdate />} />
+                    <Route path="/seller/product/update/:id" element={<UpdateProduct />} />
                 </Route>
 
                 <Route element={<AdminLayout />}>
-                    <Route path="/admin/profile" element={<AdminProfile/>} />
-                    <Route path="/admin/dashboard" element={<AdminDashboard/>} />
-                    <Route path="/admin/allSeller" element={<Sellers/>} />
-                    <Route path="/admin/allUser" element={<Users/>} />
-                    <Route path="/admin/categories" element={<ViewCategory/>} />
+                    <Route path="/admin/profile" element={<AdminProfile />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/allSeller" element={<Sellers />} />
+                    <Route path="/admin/allUser" element={<Users />} />
+                    <Route path="/admin/categories" element={<ViewCategory />} />
                 </Route>
             </Routes>
         </BrowserRouter>

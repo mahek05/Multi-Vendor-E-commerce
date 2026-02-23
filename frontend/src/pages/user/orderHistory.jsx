@@ -61,7 +61,7 @@ const OrderHistory = () => {
                                         </p>
 
                                         <p className="text-sm font-medium text-slate-900">
-                                            #{order.id.slice(0, 8)}
+                                            #{order.id?.slice(0, 8)}
                                         </p>
                                     </div>
 

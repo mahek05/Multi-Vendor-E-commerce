@@ -1,4 +1,5 @@
 const BASE = "http://localhost:5000/api";
+import { triggerAlert } from "../components/AlertContext";
 
 export const api = async (
     url,
@@ -49,13 +50,18 @@ export const api = async (
         }
 
         const refreshData = await refreshRes.json();
-
         const newAccessToken = refreshData.data.access_token;
         localStorage.setItem("accessToken", newAccessToken);
         response = await makeRequest(newAccessToken);
     }
+    const data = await response.json();
+    if (!response.ok || data.success === false) {
+        triggerAlert("error", data.message || "Something went wrong");
+    } else if (data.message && method !== "GET") {
+        triggerAlert("success", data.message);
+    }
 
-    return response.json();
+    return data;
 };
 
 

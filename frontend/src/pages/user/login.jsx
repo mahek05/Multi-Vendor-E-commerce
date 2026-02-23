@@ -21,11 +21,12 @@ const Login = () => {
             const res = await api("/user/login", "POST", formData);
 
             if (res.success) {
-                const { access_token, refresh_token, role } = res.data;
+                const { access_token, refresh_token, role, entity_id } = res.data;
 
                 localStorage.setItem("accessToken", access_token);
                 localStorage.setItem("refreshToken", refresh_token);
                 localStorage.setItem("role", role);
+                localStorage.setItem("id", entity_id);
 
                 navigate("/products");
             }

@@ -53,7 +53,7 @@ const PaymentResult = () => {
 
                     <div className="flex justify-between">
                         <span>Transaction ID</span>
-                        <span>{data.id.slice(0, 10)}</span>
+                        <span>{data.id?.slice(0, 10)}</span>
                     </div>
 
                     <div className="flex justify-between">
