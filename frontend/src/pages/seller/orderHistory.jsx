@@ -129,13 +129,14 @@ const SellerOrders = () => {
                                 <div className="divide-y divide-slate-200">
                                     <div
                                         key={order.id}
-                                        className="py-2 flex flex-col md:flex-row gap-4 justify-between"
+                                        className="flex gap-20 items-start"
                                     >
                                         <img
                                             src={`${API_BASE_URL}${order.product.image}`}
                                             alt={order.product.product_name}
                                             className="w-24 aspect-[3/4] object-cover rounded-md border"
                                         />
+
                                         <div className="flex-1">
                                             <p className="text-sm font-medium text-slate-900">
                                                 {order.product.product_name}

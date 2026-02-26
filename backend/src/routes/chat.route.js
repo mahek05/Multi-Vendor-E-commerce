@@ -17,7 +17,7 @@ router.post(
     "/admin/chat",
     verifyAdmin,
     chatController.createPrivateChat
-)
+);
 
 router.get(
     "/user/rooms",

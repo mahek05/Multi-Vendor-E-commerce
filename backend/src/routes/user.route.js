@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const userController = require("../controllers/user.controller");
+const { verifyUser, verifySeller, verifyAdmin } = require("../middlewares/auth.middleware");
+const { loginRateLimit } = require("../middlewares/rate_limit.middleware");
 const validate = require("../middlewares/validate.middleware");
 const {
     userSignupSchema,
     userLoginSchema,
     userUpdateSchema
 } = require("../validators/user.validator");
-const userController = require("../controllers/user.controller");
-const { verifyUser, verifySeller, verifyAdmin } = require("../middlewares/auth.middleware");
-const { loginRateLimit } = require("../middlewares/rate_limit.middleware");
 
 router.post(
     "/signup",
