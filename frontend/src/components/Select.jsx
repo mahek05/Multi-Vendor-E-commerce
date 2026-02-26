@@ -29,7 +29,9 @@ const Select = ({ label, name, value, onChange, required }) => {
                 required={required}
                 className="block w-full rounded-md px-4 py-2 text-sm bg-white border border-slate-300 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
             >
-                <option value="">Select Category</option>
+                <option value="">
+                    Select Category
+                </option>
 
                 {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>

@@ -48,14 +48,14 @@ const ProductDetails = () => {
 
     return (
         <div className="bg-white min-h-screen font-sans text-slate-900">
-            <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
                 <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
                     <div className="lg:col-span-5">
                         <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100 border border-gray-200">
                             <img
                                 src={`${API_BASE_URL}${product.image}`}
                                 alt={product.product_name}
-                                className="w-full aspect-[3/2] object-cover transition-transform duration-300"
+                                className="w-full aspect-[3/4] object-cover transition-transform duration-300"
                             />
                         </div>
                     </div>
@@ -188,7 +188,7 @@ const ProductDetails = () => {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

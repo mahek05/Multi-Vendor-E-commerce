@@ -8,7 +8,7 @@ const Users = () => {
     const [page, setPage] = useState(1);
 
     const fetchUser = async () => {
-        const res = await api(`/admin/getUser?page=${page}`, "GET");
+        const res = await api(`/user/admin/getUser?page=${page}`, "GET");
         if (!res.success) return;
 
         setUsers(res.data.page_data);
@@ -38,45 +38,44 @@ const Users = () => {
     };
 
     return (
-        <section className="py-10 bg-slate-50 min-h-screen">
+        <section className="min-h-[calc(100vh-4rem)] py-4 bg-slate-50">
             <div className="max-w-6xl mx-auto px-4">
                 <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">
                     User Management
                 </h2>
 
                 <div className="space-y-4">
-
                     {users.map((u) => (
                         <div
                             key={u.id}
-                            className={`bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition`}
+                            className={`bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition`}
                         >
                             <div className="flex justify-between items-start flex-wrap gap-4">
                                 <div className="space-y-1 text-left">
-                                    <p className="font-medium text-slate-900">
+                                    <p className="text-sm font-medium text-slate-900">
                                         Name: {u.name}
                                     </p>
 
-                                    <p className="text-slate-700">
+                                    <p className="text-sm text-slate-700">
                                         {u.email}
                                     </p>
 
-                                    <p className="text-slate-700">
+                                    <p className="text-sm text-slate-700">
                                         {u.phone_number}
                                     </p>
 
-                                    <p className="text-slate-700">
+                                    <p className="text-sm text-slate-700">
                                         {u.address}
                                     </p>
                                 </div>
 
                                 <div className="flex text-right justify-between gap-2">
-                                    <p className="flex text-slate-700">
+                                    <p className="text-xs flex text-slate-700">
                                         Account Status
                                     </p>
 
                                     <span
-                                        className={`px-4 flex rounded-full border ${statusStyle(u)}`}
+                                        className={`text-xs px-4 flex rounded-full border ${statusStyle(u)}`}
                                     >
                                         {getStatus(u)}
                                     </span>

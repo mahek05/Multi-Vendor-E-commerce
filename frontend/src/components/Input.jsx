@@ -6,6 +6,7 @@ const Input = ({ label, type = "text", name, value, onChange, placeholder, requi
             <label htmlFor={name} className="block text-sm font-medium leading-6 text-gray-800 mb-2">
                 {label}
             </label>
+            
             <div className="mt-2">
                 <input
                     id={name}

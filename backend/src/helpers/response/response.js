@@ -1,8 +1,5 @@
 const messages = require('./messages');
 
-/***
- * Success Response 
- */
 exports.success = function (res, messageCode = null, data = null, statusCode = 200) {
     let response = {};
     response.success = true;
@@ -13,9 +10,6 @@ exports.success = function (res, messageCode = null, data = null, statusCode = 2
     return res.status(statusCode).send(response);
 };
 
-/***
- * Error Response
- */
 exports.error = function (res, messageCode, statusCode = 422) {
     let response = {};
     response.success = false;

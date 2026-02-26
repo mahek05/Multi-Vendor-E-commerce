@@ -32,7 +32,7 @@ const AdminProfile = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 py-10 px-4">
+        <div className="min-h-screen bg-slate-50 py-5 px-5">
             <div className="max-w-4xl mx-auto space-y-6">
                 <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                     <h3 className="text-sm font-medium text-slate-500 mb-4">

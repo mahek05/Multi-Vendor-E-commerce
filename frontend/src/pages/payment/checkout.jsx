@@ -35,7 +35,7 @@ const Checkout = () => {
     if (!ready) return <div className="p-10 text-center">Preparing payment...</div>;
 
     return (
-        <div className="min-h-[70vh] justify-center items-start mt-12">
+        <div className="min-h-[70vh] justify-center items-start mt-5">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <div className="rounded-lg border border-gray-200  p-6 shadow-sm space-y-3">
                     <h2 className="text-xl font-semibold mb-6 text-gray-900">
@@ -43,20 +43,35 @@ const Checkout = () => {
                     </h2>
 
                     <div className="flex justify-between">
-                        <span className="text-slate-600">Subtotal</span>
-                        <span className="font-medium">₹{subtotal}</span>
+                        <span className="text-slate-600">
+                            Subtotal
+                        </span>
+
+                        <span className="font-medium">
+                            ₹{subtotal}
+                        </span>
                     </div>
 
                     <div className="flex justify-between">
-                        <span className="text-slate-600">Tax</span>
-                        <span>₹0</span>
+                        <span className="text-slate-600">
+                            Tax
+                        </span>
+                        
+                        <span>
+                            ₹0
+                        </span>
                     </div>
 
                     <hr />
 
                     <div className="flex justify-between font-bold text-lg">
-                        <span>Total</span>
-                        <span>₹{subtotal}</span>
+                        <span>
+                            Total
+                        </span>
+
+                        <span>
+                            ₹{subtotal}
+                        </span>
                     </div>
                 </div>
 

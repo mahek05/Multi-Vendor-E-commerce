@@ -11,6 +11,7 @@ exports.refreshAccessToken = async (req, res) => {
         if (!refreshToken) {
             return response.error(res, 1006, 401);
         }
+
         let payload;
         try {
             payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
@@ -20,13 +21,13 @@ exports.refreshAccessToken = async (req, res) => {
         }
 
         const tokenData = await regenerateAccessToken(
-            refreshToken, 
-            payload.entity_id, 
+            refreshToken,
+            payload.entity_id,
             payload.role
         );
 
         if (!tokenData) {
-            return response.error(res, 1006, 401); 
+            return response.error(res, 1024, 401);
         }
 
         return response.success(res, 1023, {
@@ -34,7 +35,6 @@ exports.refreshAccessToken = async (req, res) => {
             refresh_token: tokenData.refresh_token,
             role: tokenData.role,
         }, 200);
-
     } catch (err) {
         console.error("Refresh Token Error:", err);
         return response.error(res, 1024, 401);

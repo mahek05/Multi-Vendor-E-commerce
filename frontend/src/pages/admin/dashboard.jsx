@@ -3,8 +3,13 @@ import { api } from "../../api/api";
 
 const StatCard = ({ title, value, color }) => (
     <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:">
-        <p className="text-xs text-slate-500">{title}</p>
-        <p className={`mt-2 text-3xl font-semibold ${color}`}>{value}</p>
+        <p className="text-xs text-slate-500">
+            {title}
+        </p>
+
+        <p className={`mt-2 text-3xl font-semibold ${color}`}>
+            {value}
+        </p>
     </div>
 );
 

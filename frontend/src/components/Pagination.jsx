@@ -19,7 +19,7 @@ const Pagination = ({ pageInfo, onPageChange }) => {
                         disabled={!previous_page}
                         onClick={() => onPageChange(previous_page)}
                         className={`flex items-center justify-center px-3 h-10 border font-medium rounded-s
-              ${previous_page
+                            ${previous_page
                                 ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
                             }`}
@@ -34,7 +34,7 @@ const Pagination = ({ pageInfo, onPageChange }) => {
                             onClick={() => onPageChange(page)}
                             aria-current={page === current_page ? "page" : undefined}
                             className={`flex items-center justify-center w-10 h-10 border font-medium
-                ${page === current_page
+                                ${page === current_page
                                     ? "bg-indigo-600 text-slate-100"
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 }`}
@@ -49,7 +49,7 @@ const Pagination = ({ pageInfo, onPageChange }) => {
                         disabled={!next_page}
                         onClick={() => onPageChange(next_page)}
                         className={`flex items-center justify-center px-3 h-10 border font-medium rounded-e
-              ${next_page
+                            ${next_page
                                 ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
                             }`}

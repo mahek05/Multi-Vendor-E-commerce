@@ -12,6 +12,7 @@ exports.createCategory = async (req, res) => {
         await Category.create({
             category_name
         });
+
         return response.success(res, 2001, null, 201);
     } catch (error) {
         console.error("Create Category Error: ", error);
@@ -60,7 +61,6 @@ exports.deleteCategory = async (req, res) => {
         }
 
         await category.destroy();
-
         return response.success(res, 2003, null, 200);
     } catch (error) {
         console.error("Delete Category Error: ", error);

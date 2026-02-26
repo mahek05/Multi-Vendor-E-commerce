@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-// import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { api } from '../../api/api'
 
@@ -45,7 +44,6 @@ const AdminOtp = () => {
             otp: otpValue,
         });
 
-
         if (!verifyRes.success) {
             return alert("Invalid or expired OTP");
         }
@@ -60,7 +58,7 @@ const AdminOtp = () => {
     };
 
     return (
-        <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-slate-50">
+        <div className="flex min-h-screen flex-col justify-center px-5 py-5 lg:px-8 bg-slate-50">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-slate-900">
                     Verify Email

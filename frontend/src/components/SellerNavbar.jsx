@@ -1,19 +1,56 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { isLoggedIn } from "../utils/auth";
 import Dropdown from "./Dropdown";
 import { api } from '../api/api';
-import { User, LogOut, LogIn, UserPlus, Plus } from "lucide-react";
+import socket, { connectSocket, disconnectSocket } from "../utils/socket";
+import { User, LogOut, LogIn, UserPlus, Plus, MessageCircle } from "lucide-react";
 
 const SellerNavbar = () => {
     const navigate = useNavigate();
     const loggedIn = isLoggedIn();
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
+    const [hasUnread, setHasUnread] = useState(false);
+    const currentUserId = String(localStorage.getItem("id"));
+
+    const loadUnreadStatus = async () => {
+        if (!loggedIn) return;
+        const res = await api("/chat/seller/rooms", "GET");
+        if (!res?.success) return;
+        setHasUnread(res.data.some((room) => (room.unread_count || 0) > 0));
+    };
+
+    useEffect(() => {
+        if (!loggedIn) return;
+        connectSocket();
+        loadUnreadStatus();
+
+        const handleMessage = (msg) => {
+            if (String(msg.sender_id) !== currentUserId) {
+                setHasUnread(true);
+            }
+        };
+
+        const handleReadUpdate = ({ readBy }) => {
+            if (String(readBy) === currentUserId) {
+                loadUnreadStatus();
+            }
+        };
+
+        socket.on("room_message", handleMessage);
+        socket.on("messages_read_update", handleReadUpdate);
+
+        return () => {
+            socket.off("room_message", handleMessage);
+            socket.off("messages_read_update", handleReadUpdate);
+        };
+    }, [loggedIn, currentUserId]);
 
     const handleLogout = async () => {
         const res = await api("/seller/logout", "POST");
         if (res.success) {
+            disconnectSocket();
             localStorage.clear();
             navigate("/seller/login");
         }
@@ -26,7 +63,7 @@ const SellerNavbar = () => {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 bg-slate-300 border-b border-slate-200 z-40">
+        <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur border-b border-slate-200 z-40 shadow-sm">
             <div className="mx-auto max-w-7xl px-4 h-16 flex items-center gap-6">
 
                 {/* Logo
@@ -37,7 +74,7 @@ const SellerNavbar = () => {
                     Seller Panel
                 </button> */}
 
-                <Link to="/seller" className="font-bold text-indigo-600 text-lg">
+                <Link to="/seller" className="font-bold text-indigo-700 text-lg tracking-tight">
                     YourStore
                 </Link>
 
@@ -67,19 +104,30 @@ const SellerNavbar = () => {
                 <div className="ml-auto flex items-center gap-4 relative">
                     {!loggedIn ? (
                         <div className="flex gap-4">
-                            <Link to="/seller/login" className="text-sm font-medium text-slate-700 hover:text-indigo-600">
+                            <Link to="/seller/login" className="h-9 w-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200 transition-colors">
                                 <LogIn size={16} />
                             </Link>
-                            <Link to="/seller/signup" className="text-sm font-medium text-slate-700 hover:text-indigo-600">
+
+                            <Link to="/seller/signup" className="h-9 w-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200 transition-colors">
                                 <UserPlus size={16} />
                             </Link>
                         </div>
                     ) : (
                         <>
+                            <button
+                                onClick={() => navigate("/seller/messages")}
+                                className="h-9 w-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200 transition-colors relative"
+                                aria-label="Cart"
+                            >
+                                <MessageCircle size={18} />
+                                {hasUnread && (
+                                    <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                                )}
+                            </button>
 
                             <button
                                 onClick={() => navigate("/add-product")}
-                                className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+                                className="h-9 w-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200 transition-colors"
                                 aria-label="Add Product"
                             >
                                 <Plus size={16} />
@@ -87,7 +135,7 @@ const SellerNavbar = () => {
 
                             <button
                                 onClick={() => setOpen(!open)}
-                                className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+                                className="h-9 w-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200 transition-colors"
                                 aria-label="Seller menu"
                             >
                                 <User size={16} />
@@ -110,10 +158,12 @@ const SellerNavbar = () => {
 
                                 <button
                                     onClick={handleLogout}
-                                    className="w-full px-4 py-2 text-left text-sm text-red-800 hover:bg-slate-100 flex items-center gap-2"
+                                    className="w-full px-4 py-2 text-left text-sm text-rose-700 hover:bg-slate-100 flex items-center gap-2"
                                 >
                                     <LogOut size={16} />
-                                    <span>Logout</span>
+                                    <span>
+                                        Logout
+                                    </span>
                                 </button>
                             </Dropdown>
                         </>

@@ -48,7 +48,7 @@ const Seller = sequelize.define(
                 key: "id",
             },
         },
-        
+
         stripe_account_id: {
             type: DataTypes.STRING,
             allowNull: true

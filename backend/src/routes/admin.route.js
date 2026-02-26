@@ -56,18 +56,6 @@ router.put(
 );
 
 router.get(
-    "/getSeller",
-    verifyAdmin,
-    adminController.getSeller
-);
-
-router.get(
-    "/getUser",
-    verifyAdmin,
-    adminController.getUser
-);
-
-router.get(
     "/dashboard",
     verifyAdmin,
     adminController.getDashboard

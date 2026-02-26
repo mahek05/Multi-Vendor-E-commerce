@@ -45,7 +45,6 @@ exports.updateStatus = async (req, res) => {
         }
 
         const current_status = order_item.status;
-
         const allowedStatuses = STATUS_FLOW[current_status] || [];
 
         if (!allowedStatuses.includes(status)) {
@@ -69,7 +68,6 @@ exports.updateStatus = async (req, res) => {
         }
 
         await order_item.update(updateData);
-
         return response.success(res, 5007, order_item, 200);
     } catch (error) {
         console.error("Order Item Status Update Error: ", error);
@@ -79,7 +77,6 @@ exports.updateStatus = async (req, res) => {
 
 exports.cancelOrderItem = async (req, res) => {
     const t = await sequelize.transaction();
-
     try {
         const { order_item_id } = req.params;
         const { user_id } = req.user;
@@ -137,7 +134,6 @@ exports.cancelOrderItem = async (req, res) => {
 
         await t.commit();
         return response.success(res, 5011, { message: "Order cancelled" }, 200);
-
     } catch (error) {
         await t.rollback();
         console.error("Cancel Order Item error: ", error);
@@ -155,7 +151,7 @@ exports.requestReturn = async (req, res) => {
 
         const orderItem = await OrderItem.findOne({
             where: { id: order_item_id },
-            attributes: ["status", "return_reason"],
+            attributes: ["id", "status", "return_reason", "delivered_on"],
             include: [{
                 model: Order,
                 required: true
@@ -194,12 +190,11 @@ exports.requestReturn = async (req, res) => {
 
         await Payout.update(
             { status: "Order Returned" },
-            { where: { order_item_id, seller_id: orderItem.product.seller_id }, transaction: t }
+            { where: { order_item_id }, transaction: t }
         );
 
         await t.commit();
         return response.success(res, 5020, null, 200);
-
     } catch (error) {
         await t.rollback();
         console.error("Return Request Error: ", error);
@@ -217,7 +212,7 @@ exports.sellerOrderHistory = async (req, res) => {
         );
 
         const orderItem = await OrderItem.findAndCountAll({
-            attributes: ['product_id', 'status', 'price', "quantity", "order_id", "return_reason", "returned_on"],
+            attributes: ['id', 'product_id', 'status', 'price', "quantity", "order_id", "return_reason", "returned_on"],
             limit,
             offset,
             order: [['created_at', 'DESC']],
@@ -245,7 +240,6 @@ exports.sellerOrderHistory = async (req, res) => {
         );
 
         return response.success(res, null, paginatedResponse, 200);
-
     } catch (error) {
         console.error("Seller Order History Error: ", error);
         return response.error(res, 9999);

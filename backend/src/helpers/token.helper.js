@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const AuthToken = require("../models/auth_token.model")
+const { Op } = require("sequelize");
 
 exports.generateToken = async (entity_id, role) => {
     //For single device at a time.
@@ -42,25 +43,43 @@ exports.deactivateToken = async (token) => {
 };
 
 exports.regenerateAccessToken = async (refreshToken, entity_id, role) => {
+    const tokenRecord = await AuthToken.findOne({
+        where: {
+            refresh_token: refreshToken,
+            entity_id,
+            entity_type: role,
+            is_active: true,
+            expires_at: { [Op.gt]: new Date() }
+        },
+        attributes: ["id", "refresh_token", "entity_id", "entity_type", "expires_at"]
+    });
+
+    if (!tokenRecord) {
+        return null;
+    }
+
     const newAccessToken = jwt.sign(
         { entity_id, role },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
     );
 
-    const token = await AuthToken.update(
+    const [updatedCount] = await AuthToken.update(
         { access_token: newAccessToken, },
         {
             where: {
-                refresh_token: refreshToken,
-                entity_id: entity_id
+                id: tokenRecord.id
             }
         }
     );
 
+    if (updatedCount === 0) {
+        return null;
+    }
+
     return {
         access_token: newAccessToken,
-        refresh_token: refreshToken,
-        role: role
+        refresh_token: tokenRecord.refresh_token,
+        role: tokenRecord.entity_type
     };
 };

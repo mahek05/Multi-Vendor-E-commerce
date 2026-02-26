@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import UserLayout from "./layouts/UserLayout";
 import SellerLayout from "./layouts/SellerLayout";
 import AdminLayout from './layouts/AdminLayout';
-
 import Login from './pages/user/login';
 import Signup from './pages/user/signup';
 import Otp from './pages/user/otp';
@@ -35,6 +34,8 @@ import Checkout from './pages/payment/checkout';
 import PaymentResult from './pages/payment/paymentSuccess';
 import ChatList from './pages/chat/index';
 import Chat from './pages/chat/chatMessage';
+import CreatePrivateChat from './pages/chat/createPrivateChat';
+import CreateGroupChat from './pages/chat/createGroupChat';
 
 function App() {
     return (
@@ -62,7 +63,7 @@ function App() {
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/payment-success" element={<PaymentResult />} />
                     <Route path="/user/messages" element={<ChatList />} />
-                    <Route path="/chat/:roomId" element={<Chat />} />
+                    <Route path="/user/chat/:roomId" element={<Chat />} />
                 </Route>
 
                 <Route element={<SellerLayout />}>
@@ -74,6 +75,10 @@ function App() {
                     <Route path="/seller/profile" element={<SellerProfile />} />
                     <Route path="/seller/update" element={<SellerProfileUpdate />} />
                     <Route path="/seller/product/update/:id" element={<UpdateProduct />} />
+                    <Route path="/seller/messages" element={<ChatList />} />
+                    <Route path="/seller/chat/:roomId" element={<Chat />} />
+                    <Route path="/seller/chat/new" element={<CreatePrivateChat />} />
+                    <Route path="/seller/groupChat/new" element={<CreateGroupChat />} />
                 </Route>
 
                 <Route element={<AdminLayout />}>
@@ -82,6 +87,10 @@ function App() {
                     <Route path="/admin/allSeller" element={<Sellers />} />
                     <Route path="/admin/allUser" element={<Users />} />
                     <Route path="/admin/categories" element={<ViewCategory />} />
+                    <Route path="/admin/messages" element={<ChatList />} />
+                    <Route path="/admin/chat/:roomId" element={<Chat />} />
+                    <Route path="/admin/chat/new" element={<CreatePrivateChat />} />
+                    <Route path="/admin/groupChat/new" element={<CreateGroupChat />} />
                 </Route>
             </Routes>
         </BrowserRouter>

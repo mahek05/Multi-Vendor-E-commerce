@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { api } from '../../api/api'
+import { connectSocket } from '../../utils/socket';
 
 const AdminLogin = () => {
     const navigate = useNavigate();
@@ -21,11 +22,13 @@ const AdminLogin = () => {
             const res = await api("/admin/login", "POST", formData);
 
             if (res.success) {
-                const { access_token, refresh_token, role } = res.data;
+                const { access_token, refresh_token, role, entity_id } = res.data;
 
                 localStorage.setItem("accessToken", access_token);
                 localStorage.setItem("refreshToken", refresh_token);
                 localStorage.setItem("role", role);
+                localStorage.setItem("id", entity_id);
+                connectSocket();
 
                 navigate("/admin/dashboard");
             }
@@ -35,7 +38,7 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="flex min-h-screen flex-col justify-center px-6 pt-12 pb-40 lg:px-8 bg-slate-50">
+        <div className="flex min-h-screen flex-col justify-center px-5 pt-5 pb-40 lg:px-8 bg-slate-50">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 {/* <img 
           className="mx-auto h-10 w-auto" 

@@ -21,7 +21,6 @@ const SellerOrders = () => {
     const [page, setPage] = useState(1);
     const [openId, setOpenId] = useState(null);
 
-
     const fetchOrders = async () => {
         const res = await api(
             `/order-item/seller/history?page=${page}`,
@@ -39,6 +38,11 @@ const SellerOrders = () => {
     }, [page]);
 
     const updateStatus = async (item, newStatus) => {
+        if (!item?.id) {
+            console.error("Missing order item id for status update", item);
+            return;
+        }
+
         await api(`/order-item/status/${item.id}`, "PUT", {
             status: newStatus,
         });
@@ -55,7 +59,7 @@ const SellerOrders = () => {
     }
 
     return (
-        <section className="py-10 bg-slate-50 relative">
+        <section className="min-h-[calc(100vh-4rem)] py-4 bg-slate-50">
             <div className="max-w-6xl mx-auto px-4">
                 <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">
                     Seller Orders
@@ -63,6 +67,15 @@ const SellerOrders = () => {
 
                 <div className="space-y-4">
                     {orders.map((order) => {
+                        const returnApprovalStatus =
+                            order.status === "Return Request Approved"
+                                ? "Approved"
+                                : order.status === "Return Request Not Approved"
+                                    ? "Not Approved"
+                                    : order.status === "Return Requested"
+                                        ? "Pending"
+                                        : null;
+
                         const rawDate =
                             order.order.created_at ||
                             order.order.createdAt ||
@@ -116,12 +129,12 @@ const SellerOrders = () => {
                                 <div className="divide-y divide-slate-200">
                                     <div
                                         key={order.id}
-                                        className="py-4 flex gap-4 items-start"
+                                        className="py-2 flex flex-col md:flex-row gap-4 justify-between"
                                     >
                                         <img
                                             src={`${API_BASE_URL}${order.product.image}`}
                                             alt={order.product.product_name}
-                                            className="w-24 h-20 object-cover rounded-md border"
+                                            className="w-24 aspect-[3/4] object-cover rounded-md border"
                                         />
                                         <div className="flex-1">
                                             <p className="text-sm font-medium text-slate-900">
@@ -203,6 +216,31 @@ const SellerOrders = () => {
                                                     {order.status}
                                                 </span>
                                             </div>
+
+                                            {returnApprovalStatus && (
+                                                <div className="text-right">
+                                                    <p className="text-xs text-slate-500">
+                                                        Return Approval
+                                                    </p>
+
+                                                    <span
+                                                        className={`text-xs font-normal px-2 py-1 rounded-full border ${returnApprovalStatus === "Approved"
+                                                            ? "bg-green-50 text-green-700 border-green-200"
+                                                            : returnApprovalStatus === "Not Approved"
+                                                                ? "bg-red-50 text-red-700 border-red-200"
+                                                                : "bg-amber-50 text-amber-700 border-amber-200"
+                                                            }`}
+                                                    >
+                                                        {returnApprovalStatus}
+                                                    </span>
+
+                                                    {order.return_reason && (
+                                                        <p className="text-xs text-slate-500 mt-1 max-w-[220px]">
+                                                            Reason: {order.return_reason}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
 
                                             <div className="text-right">
                                                 <p className="text-xs text-slate-500">

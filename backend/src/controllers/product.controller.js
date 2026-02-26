@@ -39,6 +39,7 @@ exports.createProduct = async (req, res) => {
             stock,
             seller_id
         });
+
         return response.success(res, 3001, null, 201);
     } catch (error) {
         console.error("Create Product Error: ", error);

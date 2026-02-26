@@ -9,10 +9,6 @@ const Seller = require("../models/seller.model");
 const Product = require("../models/product.model");
 const OrderItem = require("../models/order_item.model");
 const {
-    getPaginationMetadata,
-    getPaginatedResponse
-} = require("../helpers/pagination.helper");
-const {
     generateToken,
     deactivateToken
 } = require("../helpers/token.helper");
@@ -203,69 +199,6 @@ exports.sellerStatus = async (req, res) => {
         return response.success(res, 1021, null, 201);
     } catch (error) {
         console.error("Seller Status Error: ", error);
-        return response.error(res, 9999);
-    }
-};
-
-exports.getSeller = async (req, res) => {
-    try {
-        const { page, limit, offset } = getPaginationMetadata(
-            req.query.page,
-            req.query.limit
-        );
-
-        const sellers = await Seller.findAndCountAll({
-            attributes: ["id", "name", "email", "phone_number", "address", "status"],
-            paranoid: false,
-            include: [
-                {
-                    model: Admin,
-                    as: "admin",
-                    attributes: ["name", "id"],
-                },
-            ],
-            limit,
-            offset,
-            order: [["created_at", "DESC"]],
-        });
-
-        const paginatedResponse = getPaginatedResponse(
-            sellers,
-            page,
-            limit
-        );
-
-        return response.success(res, null, paginatedResponse, 200);
-    } catch (error) {
-        console.error("Get Seller Error:", error);
-        return response.error(res, 9999);
-    }
-};
-
-exports.getUser = async (req, res) => {
-    try {
-        const { page, limit, offset } = getPaginationMetadata(
-            req.query.page,
-            req.query.limit
-        );
-
-        const user = await User.findAndCountAll({
-            attributes: ["id", "name", "email", "phone_number", "address", "deleted_at"],
-            paranoid: false,
-            limit,
-            offset,
-            order: [["created_at", "DESC"]],
-        });
-
-        const paginatedResponse = getPaginatedResponse(
-            user,
-            page,
-            limit
-        );
-
-        return response.success(res, null, paginatedResponse, 200);
-    } catch (error) {
-        console.error("Get User Error:", error);
         return response.error(res, 9999);
     }
 };

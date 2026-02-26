@@ -63,7 +63,7 @@ const Cart = () => {
     }
 
     return (
-        <section className="py-10 bg-slate-50 relative">
+        <section className="min-h-[calc(100vh-4rem)] py-4 bg-slate-50">
             <div className="max-w-6xl mx-auto px-4">
                 <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">
                     Shopping Cart
@@ -79,7 +79,7 @@ const Cart = () => {
                             <img
                                 src={`${API_BASE_URL}${item.product.image}`}
                                 alt={item.product.product_name}
-                                className="w-30 h-20 object-cover rounded-md border"
+                                className="w-24 aspect-[3/4] object-cover rounded-md border"
                             />
 
                             <div className="flex-1">

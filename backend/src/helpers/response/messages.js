@@ -1,5 +1,4 @@
 const MESSAGES = {
-
     // User, Admin and Seller
     '1001': 'Registered successfully.',
     '1002': 'Sign in successfully.',
@@ -62,7 +61,7 @@ const MESSAGES = {
     '5013': 'Seller has already been paid for this item.',
     '5014': 'This order was refunded.',
     '5015': 'Seller Stripe account not found or not connected.',
-    '5016': 'Seller Stripe account not found or not connected.',
+    '5016': 'Quantity is invalid.',
     '5017': 'Can\'t be refunded',
     '5018': 'Product can\'t be returned.',
     '5019': 'Can\'t return.',
@@ -77,6 +76,8 @@ const MESSAGES = {
     '6004': 'No valid participants found. Please check the emails.',
     '6005': 'Private chat created.',
     '6006': 'Access Denied: You are not a member of this chat room.',
+    '6007': 'Private Chat with this user is already created.',
+    '6008': 'Group chat created.',
 
     // Common
     '9000': 'Please enter valid data!',

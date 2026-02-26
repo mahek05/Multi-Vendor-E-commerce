@@ -4,7 +4,6 @@ import { useState } from "react";
 const PaymentForm = () => {
     const stripe = useStripe();
     const elements = useElements();
-
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 

@@ -24,7 +24,7 @@ const SellerProductsByCategory = () => {
     }, [name, page]);
 
     return (
-        <div className="flex min-h-screen flex-col px-6 py-6 lg:px-8 bg-slate-50">
+        <div className="flex min-h-screen flex-col px-5 py-5 lg:px-8 bg-slate-50">
             <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">
                 Category: {name}
             </h2>

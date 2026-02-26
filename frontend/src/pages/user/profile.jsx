@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import { disconnectSocket } from "../../utils/socket";
 
-const SellerProfile = () => {
+const UserProfile = () => {
     const [profile, setProfile] = useState([]);
     const navigate = useNavigate();
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -27,6 +28,7 @@ const SellerProfile = () => {
         const res = await api(`/user/profile`, "DELETE");
 
         if (res?.success) {
+            disconnectSocket();
             localStorage.clear();
             navigate("/login");
         }
@@ -131,6 +133,6 @@ const SellerProfile = () => {
             )}
         </div>
     );
-}
+};
 
-export default SellerProfile;
+export default UserProfile;

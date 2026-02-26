@@ -31,20 +31,46 @@ exports.checkout = async (req, res) => {
         if (!user) return response.error(res, 1006, 404);
 
         const customer_id = await getOrCreateCustomer(user);
-
-        let total_amount = 0;
-
-        for (const items of cart_items) {
-            if (!items.product) {
+        const requestedByProductId = {};
+        
+        for (const item of cart_items) {
+            if (!item.product) {
                 return response.error(res, 3002, 404);
             }
-            if (items.product.stock < items.quantity) {
-                return response.error(res, 5022, 400)
+
+            if (!item.quantity || item.quantity <= 0) {
+                return response.error(res, 5016, 400)
             }
 
-            total_amount += Number(items.product.price) * items.quantity;
+            const productId = item.product.id;
+            requestedByProductId[productId] = (requestedByProductId[productId] || 0) + item.quantity;
         }
 
+        const productIds = Object.keys(requestedByProductId);
+        const products = await Product.findAll({
+            where: { id: productIds },
+            attributes: ["id", "price", "stock"]
+        });
+
+        const productMap = {};
+        products.forEach((product) => {
+            productMap[product.id] = product;
+        });
+
+        let total_amount = 0;
+        for (const productId of productIds) {
+            const product = productMap[productId];
+            const requestedQty = requestedByProductId[productId];
+
+            if (!product) {
+                return response.error(res, 3002, 404);
+            }
+
+            if (product.stock < requestedQty) {
+                return response.error(res, 5022, 400);
+            }
+            total_amount += Number(product.price) * requestedQty;
+        }
         const paymentIntent = await createCheckoutIntent(total_amount, { user_id }, "inr", customer_id);
 
         return response.success(res, null, {
@@ -59,7 +85,6 @@ exports.checkout = async (req, res) => {
 exports.verifyPayment = async (req, res) => {
     try {
         const { payment_intent } = req.params;
-
         const intent = await stripe.paymentIntents.retrieve(payment_intent);
 
         if (intent.status !== "succeeded")
@@ -88,6 +113,15 @@ exports.orderHistory = async (req, res) => {
             include: [
                 {
                     model: OrderItem,
+                    attributes: [
+                        "id",
+                        "quantity",
+                        "price",
+                        "status",
+                        "return_reason",
+                        "delivered_on",
+                        "returned_on"
+                    ],
                     include: [{
                         model: Product,
                         attributes: ["product_name", "image"]

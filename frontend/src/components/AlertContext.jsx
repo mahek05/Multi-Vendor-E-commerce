@@ -43,7 +43,10 @@ export const AlertProvider = ({ children }) => {
                         <div className="font-semibold">
                             {alert.type === "error" ? "Error" : "Success"}
                         </div>
-                        <div>{alert.message}</div>
+
+                        <div>
+                            {alert.message}
+                        </div>
                     </div>
                 </div>
             )}

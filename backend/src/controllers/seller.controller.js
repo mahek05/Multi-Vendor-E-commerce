@@ -1,10 +1,13 @@
 const Seller = require("../models/seller.model");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const Admin = require("../models/admin.model");
 const { createConnectedAccount, generateOnboardingLink } = require("../helpers/stripe.helper");
 const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const response = require('../helpers');
+const {
+    getPaginationMetadata,
+    getPaginatedResponse
+} = require("../helpers/pagination.helper");
 const {
     generateToken,
     deactivateToken
@@ -163,7 +166,6 @@ exports.deactivateProfile = async (req, res) => {
         }
 
         await seller.destroy();
-
         await deactivateToken(token);
 
         return response.success(res, 1012, null, 200);
@@ -195,6 +197,40 @@ exports.onboardStripe = async (req, res) => {
         return response.success(res, 1025, { url }, 200);
     } catch (error) {
         console.error("Seller Stripe Onboarding Error:", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getSeller = async (req, res) => {
+    try {
+        const { page, limit, offset } = getPaginationMetadata(
+            req.query.page,
+            req.query.limit
+        );
+
+        const sellers = await Seller.findAndCountAll({
+            attributes: ["id", "name", "email", "phone_number", "address", "status"],
+            include: [
+                {
+                    model: Admin,
+                    as: "admin",
+                    attributes: ["name", "id"],
+                },
+            ],
+            limit,
+            offset,
+            order: [["created_at", "DESC"]],
+        });
+
+        const paginatedResponse = getPaginatedResponse(
+            sellers,
+            page,
+            limit
+        );
+
+        return response.success(res, null, paginatedResponse, 200);
+    } catch (error) {
+        console.error("Get Seller Error:", error);
         return response.error(res, 9999);
     }
 };

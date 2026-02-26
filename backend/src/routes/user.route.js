@@ -7,7 +7,7 @@ const {
     userUpdateSchema
 } = require("../validators/user.validator");
 const userController = require("../controllers/user.controller");
-const { verifyUser } = require("../middlewares/auth.middleware");
+const { verifyUser, verifySeller, verifyAdmin } = require("../middlewares/auth.middleware");
 const { loginRateLimit } = require("../middlewares/rate_limit.middleware");
 
 router.post(
@@ -52,6 +52,30 @@ router.post(
     "/onboard-stripe", 
     verifyUser,
     userController.onboardStripe
+);
+
+router.get(
+    "/admin/getUser",
+    verifyAdmin,
+    userController.getUser
+);
+
+router.get(
+    "/seller/getUser",
+    verifySeller,
+    userController.getUser
+);
+
+router.get(
+    "/admin/getUser",
+    verifyAdmin,
+    userController.getUser
+);
+
+router.get(
+    "/admin/getUserDelete",
+    verifySeller,
+    userController.getUser
 );
 
 module.exports = router;

@@ -20,7 +20,7 @@ const ProductCard = ({ product }) => {
                     <img
                         src={`${API_BASE_URL}${product.image}`}
                         alt={product.product_name}
-                        className="w-full aspect-[3/2] object-cover transition-transform duration-300"
+                        className="w-full aspect-[3/4] object-cover transition-transform duration-300"
                     />
                 </Link>
             )}
@@ -30,7 +30,7 @@ const ProductCard = ({ product }) => {
                     <img
                         src={`${API_BASE_URL}${product.image}`}
                         alt={product.product_name}
-                        className="w-full aspect-[3/2] object-cover transition-transform duration-300"
+                        className="w-full aspect-[3/4] object-cover transition-transform duration-300"
                     />
                 </Link>
             )}

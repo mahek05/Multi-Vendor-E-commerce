@@ -1,7 +1,5 @@
 const sequelize = require("../config/sequelize");
-const { DataTypes } = require("sequelize");
 
-// 1. Import and Assign Models to Variables
 const Admin = require("./admin.model");
 const AuthToken = require("./auth_token.model");
 const CartItem = require("./cart_item.model");

@@ -8,54 +8,52 @@ module.exports = (io) => {
     io.on("connection", (socket) => {
         if (!socket.user) {
             console.error("Add user details.");
-            return socket.disconnected();
+            return socket.disconnect(true);
         }
 
         const { id: userId, role: userRole } = socket.user;
-        console.log(`Connected: ${userRole} ${userId}`);
 
         if (!onlineUsers.has(userId)) {
             onlineUsers.set(userId, new Set());
         }
 
         onlineUsers.get(userId).add(socket.id);
+        const personalRoom = `${userRole}:${userId}`;
+        socket.join(personalRoom);
 
         socket.on("join_room", async ({ roomId }) => {
             try {
-                if (!roomId) return socket.emit("error", "Room ID is required");
-
-                if (socket.rooms.has(roomId)) {
-                    return socket.emit("room_joined", { roomId, status: "already_joined" });
-                }
+                if (!roomId) return;
 
                 const participant = await RoomParticipant.findOne({
                     where: {
                         room_id: roomId,
                         user_id: userId,
                         user_role: userRole
-                    },
-                    attributes: ['id']
+                    }
                 });
 
-                if (participant) {
-                    socket.join(roomId);
-                    socket.to(roomId).emit("onlineStatus", { userId, isOnline: true });
-                    socket.emit("room_joined", { roomId, status: "success" });
-                } else {
-                    socket.emit("error", { message: "Access denied." });
+                if (!participant) {
+                    return socket.emit("chat_error", { message: "Access denied." });
                 }
+                socket.join(roomId);
+
+                const statuses = {};
+                onlineUsers.forEach((set, id) => {
+                    statuses[id] = set.size > 0;
+                });
+
+                io.emit("onlineStatus", statuses);
+                socket.emit("room_joined", { roomId });
             } catch (err) {
                 console.error("Join Room Error:", err);
-                socket.emit("error", { message: "Failed to join room" });
             }
         });
 
         socket.on("send_message", async ({ roomId, message }) => {
             try {
-                // const { roomId, message } = data;
-
                 if (!roomId || !message) {
-                    return socket.emit("error", "Missing roomId or message");
+                    return socket.emit("chat_error", { message: "Missing roomId or message" });
                 }
 
                 const roomSockets = io.sockets.adapter.rooms.get(roomId);
@@ -73,17 +71,44 @@ module.exports = (io) => {
 
                 io.to(roomId).emit("receive_message", responseData);
 
+                const participants = await RoomParticipant.findAll({
+                    where: { room_id: roomId },
+                    attributes: ["user_id", "user_role"]
+                });
+
+                participants.forEach((participant) => {
+                    io.to(`${participant.user_role}:${participant.user_id}`).emit("room_message", responseData);
+                });
             } catch (err) {
                 console.error("Message Error:", err);
-                socket.emit("error", { message: "Message failed to send" });
+                socket.emit("chat_error", { message: "Message failed to send" });
             }
         });
 
         socket.on("typing", ({ roomId, isTyping }) => {
             socket.to(roomId).emit("typingStatus", {
+                roomId,
                 senderId: userId,
                 isTyping
             });
+
+            RoomParticipant.findAll({
+                where: { room_id: roomId },
+                attributes: ["user_id", "user_role"]
+            })
+                .then((participants) => {
+                    participants.forEach((participant) => {
+                        if (String(participant.user_id) === String(userId)) return;
+                        io.to(`${participant.user_role}:${participant.user_id}`).emit("typingStatus", {
+                            roomId,
+                            senderId: userId,
+                            isTyping
+                        });
+                    });
+                })
+                .catch((err) => {
+                    console.error("Typing Broadcast Error:", err);
+                });
         });
 
         socket.on("getOnlineStatuses", () => {
@@ -96,12 +121,15 @@ module.exports = (io) => {
                 socket.emit("onlineStatus", statuses);
             } catch (err) {
                 console.error("Error fetching online statuses:", err);
-                socket.emit("error", "Failed to get online statuses");
+                socket.emit("chat_error", { message: "Failed to get online statuses" });
             }
         });
 
         socket.on("mark_messages_read", async ({ roomId }) => {
             try {
+                if (!roomId) {
+                    return;
+                }
                 const unreadMessages = await Chat.findAll({
                     where: {
                         room_id: roomId,
@@ -146,17 +174,17 @@ module.exports = (io) => {
                 if (userSockets.size === 0) {
                     onlineUsers.delete(userId);
 
-                    rooms.forEach((roomId) => {
-                        if (roomId !== socket.id) {
-                            io.to(roomId).emit("onlineStatus", { userId, isOnline: false });
-                        }
+                    const statuses = {};
+                    onlineUsers.forEach((set, id) => {
+                        statuses[id] = set.size > 0;
                     });
+
+                    io.emit("onlineStatus", statuses);
                 }
             }
         });
 
         socket.on("disconnect", async () => {
-            console.log(`Disconnected: ${userId}`);
         });
     });
 };

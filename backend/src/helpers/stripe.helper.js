@@ -1,7 +1,6 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 exports.getOrCreateCustomer = async (user) => {
-
     if (user.stripe_customer_id)
         return user.stripe_customer_id;
 

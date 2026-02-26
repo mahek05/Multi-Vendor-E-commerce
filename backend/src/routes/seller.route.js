@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const sellerController = require("../controllers/seller.controller");
-const { verifySeller } = require("../middlewares/auth.middleware");
+const { verifySeller, verifyAdmin } = require("../middlewares/auth.middleware");
 const { loginRateLimit } = require("../middlewares/rate_limit.middleware");
 const validate = require("../middlewares/validate.middleware");
 const {
@@ -50,9 +50,15 @@ router.delete(
 );
 
 router.post(
-    "/onboard-stripe", 
+    "/onboard-stripe",
     verifySeller,
     sellerController.onboardStripe
+);
+
+router.get(
+    "/getSeller",
+    verifyAdmin,
+    sellerController.getSeller
 );
 
 module.exports = router;

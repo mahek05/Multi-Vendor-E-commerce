@@ -1,10 +1,13 @@
 const User = require("../models/user.model");
-const AuthToken = require("../models/auth_token.model");
 const { createConnectedAccount, generateOnboardingLink } = require("../helpers/stripe.helper");
 const EmailOtp = require("../models/email_otp.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const response = require('../helpers');
+const {
+    getPaginationMetadata,
+    getPaginatedResponse
+} = require("../helpers/pagination.helper");
 const {
     generateToken,
     deactivateToken
@@ -152,6 +155,7 @@ exports.deactivateProfile = async (req, res) => {
     try {
         const { user_id } = req.user;
         const token = req.headers.authorization?.split(" ")[1];
+
         if (!token) {
             return response.error(res, 1008, 401);
         }
@@ -163,7 +167,6 @@ exports.deactivateProfile = async (req, res) => {
         }
 
         await user.destroy();
-
         await deactivateToken(token);
 
         return response.success(res, 1012, null, 200);
@@ -193,6 +196,61 @@ exports.onboardStripe = async (req, res) => {
         return response.success(res, 1025, { url }, 200);
     } catch (error) {
         console.error("Stripe User Onboarding Error: ", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getUserDelete = async (req, res) => {
+    try {
+        const { page, limit, offset } = getPaginationMetadata(
+            req.query.page,
+            req.query.limit
+        );
+
+        const user = await User.findAndCountAll({
+            attributes: ["id", "name", "email", "phone_number", "address", "deleted_at"],
+            paranoid: false,
+            limit,
+            offset,
+            order: [["created_at", "DESC"]],
+        });
+
+        const paginatedResponse = getPaginatedResponse(
+            user,
+            page,
+            limit
+        );
+
+        return response.success(res, null, paginatedResponse, 200);
+    } catch (error) {
+        console.error("Get User Error:", error);
+        return response.error(res, 9999);
+    }
+};
+
+exports.getUser = async (req, res) => {
+    try {
+        const { page, limit, offset } = getPaginationMetadata(
+            req.query.page,
+            req.query.limit
+        );
+
+        const user = await User.findAndCountAll({
+            attributes: ["id", "name", "email", "phone_number", "address", "deleted_at"],
+            limit,
+            offset,
+            order: [["created_at", "DESC"]],
+        });
+
+        const paginatedResponse = getPaginatedResponse(
+            user,
+            page,
+            limit
+        );
+
+        return response.success(res, null, paginatedResponse, 200);
+    } catch (error) {
+        console.error("Get User Error:", error);
         return response.error(res, 9999);
     }
 };
