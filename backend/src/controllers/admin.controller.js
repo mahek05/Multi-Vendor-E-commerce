@@ -10,7 +10,8 @@ const Product = require("../models/product.model");
 const OrderItem = require("../models/order_item.model");
 const {
     generateToken,
-    deactivateToken
+    deactivateToken,
+    deactivateAccountToken
 } = require("../helpers/token.helper");
 
 exports.signup = async (req, res) => {
@@ -157,12 +158,7 @@ exports.deactivateProfile = async (req, res) => {
             return response.error(res, 1006, 404);
         }
 
-        const token = req.headers.authorization?.split(" ")[1];
-        if (!token) {
-            return response.error(res, 1008, 401);
-        }
-
-        await deactivateToken(token);
+        await deactivateAccountToken(admin_id);
         await admin.destroy();
 
         return response.success(res, 1012, null, 200);

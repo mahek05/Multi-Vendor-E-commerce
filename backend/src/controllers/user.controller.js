@@ -10,7 +10,8 @@ const {
 } = require("../helpers/pagination.helper");
 const {
     generateToken,
-    deactivateToken
+    deactivateToken,
+    deactivateAccountToken
 } = require("../helpers/token.helper");
 
 exports.signup = async (req, res) => {
@@ -154,11 +155,6 @@ exports.updateProfile = async (req, res) => {
 exports.deactivateProfile = async (req, res) => {
     try {
         const { user_id } = req.user;
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return response.error(res, 1008, 401);
-        }
 
         const user = await User.findOne({ where: { id: user_id } });
 
@@ -166,8 +162,8 @@ exports.deactivateProfile = async (req, res) => {
             return response.error(res, 1006, 404);
         }
 
+        await deactivateAccountToken(user_id);
         await user.destroy();
-        await deactivateToken(token);
 
         return response.success(res, 1012, null, 200);
     } catch (error) {

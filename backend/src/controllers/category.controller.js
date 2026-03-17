@@ -9,6 +9,14 @@ exports.createCategory = async (req, res) => {
     try {
         const { category_name } = req.body;
 
+        const category = await Category.findOne({
+            where: { category_name }
+        });
+
+        if (category) {
+            return response.error(res, 2005, 404);
+        }
+
         await Category.create({
             category_name
         });
@@ -24,6 +32,14 @@ exports.updateCategory = async (req, res) => {
     try {
         const { category_name } = req.body;
         const { id } = req.params;
+
+        const exist = await Category.findOne({
+            where: { category_name }
+        });
+
+        if (exist) {
+            return response.error(res, 2005, 404);
+        }
 
         const category = await Category.findOne({
             where: {

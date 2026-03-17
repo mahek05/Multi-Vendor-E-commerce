@@ -32,6 +32,7 @@ const MESSAGES = {
     '2002': 'Category not found!',
     '2003': 'Category deleted successfully.',
     '2004': 'Category updated successfully.',
+    '2005': 'Category already exist.',
 
     //Product
     '3001': 'Product created successfully.',

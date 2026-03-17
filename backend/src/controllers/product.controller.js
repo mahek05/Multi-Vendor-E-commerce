@@ -14,14 +14,16 @@ exports.createProduct = async (req, res) => {
         const { product_name, description, price, stock, category_id } = req.body;
         const seller_id = req.seller.seller_id;
 
-        const category = await Category.findAll({
-            where: {
-                id: category_id
-            }
-        });
+        if (category_id !== undefined) {
+            const category = await Category.findOne({
+                where: {
+                    id: category_id
+                }
+            });
 
-        if (!category) {
-            return response.error(res, 2002, 404);
+            if (!category) {
+                return response.error(res, 2002, 404);
+            }
         }
 
         let imagePath = null;
@@ -70,15 +72,35 @@ exports.updateProduct = async (req, res) => {
             return response.error(res, 3002, 404);
         }
 
+        const category = await Category.findOne({
+            where: {
+                id: category_id
+            }
+        });
+
+        if (!category) {
+            return response.error(res, 2002, 404);
+        }
+
         if (newImagePath && product.image) {
             deleteFile(product.image);
+        }
+
+        let updatedStock = product.stock;
+        if (stock !== undefined) {
+            const stockDelta = Number(stock);
+            if (!Number.isFinite(stockDelta)) {
+                if (newImagePath) deleteFile(newImagePath);
+                return response.error(res, 9000, 400);
+            }
+            updatedStock = product.stock + stockDelta;
         }
 
         await product.update({
             product_name: product_name ?? product.product_name,
             description: description ?? product.description,
             price: price ?? product.price,
-            stock: (product.stock + stock) ?? product.stock,
+            stock: updatedStock,
             image: newImagePath ?? product.image,
             category_id: category_id ?? product.category_id
         });

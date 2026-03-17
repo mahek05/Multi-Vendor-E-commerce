@@ -42,6 +42,12 @@ exports.deactivateToken = async (token) => {
     );
 };
 
+exports.deactivateAccountToken = async (user_id) => {
+    await AuthToken.destroy(
+        { where: { user_id } }
+    );
+};
+
 exports.regenerateAccessToken = async (refreshToken, entity_id, role) => {
     const tokenRecord = await AuthToken.findOne({
         where: {
