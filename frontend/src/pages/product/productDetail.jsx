@@ -93,9 +93,8 @@ const ProductDetails = () => {
 
                             <div className="mt-4">
                                 <p className="text-sm text-gray-500">
-                                    Delivery by
                                     <span className="font-bold text-gray-900">
-                                        {formattedDelivery}
+                                        Delivery by: {formattedDelivery}
                                     </span>
                                 </p>
 

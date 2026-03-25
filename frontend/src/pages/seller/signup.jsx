@@ -77,14 +77,6 @@ const SellerSignup = () => {
                     />
 
                     <Input
-                        label="Stripe Payment id"
-                        name="stripe_account_id"
-                        value={formData.stripe_account_id}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <Input
                         label="Password"
                         name="password"
                         type="password"

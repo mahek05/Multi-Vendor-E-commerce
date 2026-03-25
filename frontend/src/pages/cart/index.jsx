@@ -140,9 +140,6 @@ const Cart = () => {
                             Proceed to Checkout
                         </button>
 
-                        <p className="mt-3 text-xs text-slate-500 text-center">
-                            Shipping, taxes and discounts calculated at checkout
-                        </p>
                     </div>
                 </div>
             </div>

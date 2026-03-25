@@ -242,7 +242,7 @@ exports.getDashboard = async (req, res) => {
                 totalProducts,
                 revenue: revenueData || 0,
                 returnRate,
-                pendingPayout
+                pendingPayout: pendingPayout || 0
             }
         });
     } catch (error) {
